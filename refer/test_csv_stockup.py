@@ -37,8 +37,12 @@ while True:
     x = x+timegap
     now_day = last_date + timedelta(days=x) 
     yearnum = datetime.strftime(now_day, '%Y')
-    week_day = datetime.weekday(now_day)
 
+    # weekday : 0-6,sunday為6, isoweekday : 1-7 sunday為7
+    # week_day = datetime.weekday(now_day)
+    week_day = datetime.isoweekday(now_day)
+    if now_day > today :
+        quit()
     # if week_day == 5 or week_day == 6: #星期六或星期日
     #     continue
     # 算出民國年
@@ -56,11 +60,10 @@ while True:
                     engine="python")
         # print(data)
     except:
-        r_wday = week_day + 1
-        print(f"{upnewd}(星期{r_wday})今天可能是假日")
+        print(f"{upnewd}(星期{week_day})今天可能是假日")
         timegap = 1
         continue
-
+    # quit()
     all_id_name = []
     all_stocks_shin = []
     new_id = []
