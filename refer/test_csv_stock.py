@@ -64,6 +64,20 @@ while True:
                     )
     except:
         print(f"{upnewd}(星期{week_day})今天可能是假日")
+        onedaytype = {
+        "Up_date" : DATE,
+        "New_up" : NVARCHAR(length=1000),
+        }
+        a_day = {
+            "Up_date" : now_day,
+            "New_up" : "holiday"
+        }
+
+        # 必須設index
+        df_day = pd.DataFrame(a_day, index=[0])
+        print(df_day)
+        df_day.to_sql('shin_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
+        
         timegap = 1
         continue
     

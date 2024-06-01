@@ -61,6 +61,20 @@ while True:
         # print(data)
     except:
         print(f"{upnewd}(星期{week_day})今天可能是假日")
+        onedaytype = {
+        "Up_date" : DATE,
+        "New_up" : NVARCHAR(length=1000),
+        }
+        a_day = {
+            "Up_date" : now_day,
+            "New_up" : "holiday"
+        }
+
+        # 必須設index
+        df_day = pd.DataFrame(a_day, index=[0])
+        print(df_day)
+        df_day.to_sql('sup_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
+        
         timegap = 1
         continue
     # quit()
@@ -181,7 +195,7 @@ while True:
     # 建立新df做每日報表
     # 以後加入創新高個股名單
     if newup == [] :
-        newup = "Today no new stock"
+        newup = ""
     onedaytype = {
         "Up_date" : DATE,
         "New_up" : NVARCHAR(length=1000),
