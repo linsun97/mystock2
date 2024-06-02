@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 import time
 import email.message
+from pandas.api.types import is_string_dtype
+from pandas.api.types import is_numeric_dtype
 
 # 設定float格式為小數點後兩位
 pd.set_option("display.float_format",'{:.2f}'.format)
@@ -103,13 +105,20 @@ while True:
     df['up_date'] = now_day
 
 # str轉為字串,strip去掉前後的空白
-    df['open'] = df['open'].str.strip()
-    df['high'] = df['high'].str.strip()
-    df['low'] = df['low'].str.strip()
-    df['over'] = df['over'].str.strip()
+    if (is_string_dtype(df['open'])):
+        df['open'] = df['open'].str.strip()
+    if (is_string_dtype(df['high'])):
+        df['high'] = df['high'].str.strip()
+    if (is_string_dtype(df['low'])):
+        df['low'] = df['low'].str.strip()
+    if (is_string_dtype(df['over'])):
+        df['over'] = df['over'].str.strip()
+    if (is_string_dtype(df['volume'])):
+        df['volume'] = df['volume'].str.strip()
 
 
     df.loc[df['high']=="---",["open","high","low","over"]] = df.loc[df["high"]=="---","bef"]
+    
     df = df.astype(
                 {
                     'stockid':'int16',
@@ -195,14 +204,15 @@ while True:
     # 建立新df做每日報表
     # 以後加入創新高個股名單
     if newup == [] :
-        newup = ""
+        new_stocks = "Today no new stocks"
+    else:
+        for new_one in newup:
+            new_stocks = new_stocks+","+str(new_one)
+
     onedaytype = {
         "Up_date" : DATE,
         "New_up" : NVARCHAR(length=1000),
     }
-    new_stocks = "news" 
-    for new_one in newup:
-        new_stocks = new_stocks+","+new_one
     a_day = {
         "Up_date" : now_day,
         "New_up" : new_stocks

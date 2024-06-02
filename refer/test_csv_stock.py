@@ -1,4 +1,3 @@
-import  urllib.request,csv
 from sqlalchemy import create_engine
 from datetime import datetime 
 from datetime import timedelta
@@ -6,12 +5,16 @@ from sqlalchemy.types import NVARCHAR, Float, Integer,DATE
 import pandas as pd
 import email.message
 import time
+from pandas.api.types import is_string_dtype
+from pandas.api.types import is_numeric_dtype
 
 # 設定float格式為小數點後兩位
 pd.set_option("display.float_format",'{:.2f}'.format)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.max_rows', 500)
 today = datetime.today().date()
 
-#站食用昨天日期來測試20231207
+#第一次先執行start_shin.py才能,只要執行一次就好,設定起始日
 engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3306/stock")
 try:
     last_date = pd.read_sql("SELECT Up_date FROM shin_oneday ORDER BY Up_date DESC LIMIT 1",engine)
@@ -50,9 +53,10 @@ while True:
         timegap = 0
         data = pd.read_csv(url,
                     #  na_values="-"
-                    header=4,
+                    header=3,
                     skipfooter=6,
                     usecols=[1,2,6,9,10,11,12],
+                    names=['stockid','stockname','bef','high','low','over','volume'],
                     thousands=",",
                     encoding="cp950",
                     #  parse_dates=["dateone"], #需用中掛號包住
@@ -62,6 +66,7 @@ while True:
                     engine='python'
                     
                     )
+        
     except:
         print(f"{upnewd}(星期{week_day})今天可能是假日")
         onedaytype = {
@@ -81,47 +86,81 @@ while True:
         timegap = 1
         continue
     
-    # 新增一個open的欄位
+    # 新增一個open的欄位,只有bef是float,所以open也是float
     data['open'] = data['bef']
 
     all_id_name = []
     all_stocks_shin = []
     new_id = []
+    # print(data)
+    # quit()
     try: 
         for i,row in data.iterrows():
-            if len(row["stockid"]) !=  4 :
+            # print(row)
+            # 原始資料內有空白,必須先去掉
+            if len(str(row["stockid"]).strip()) !=  4 :
                 continue
+            
             stock_shin_id_name = [str(row["stockid"]).strip(),str(row["stockname"]).strip()]
             stock_shin = [str(row["stockid"]).strip(),str(row["stockname"]).strip(),row["over"],row["open"],row["high"],row["low"],row["bef"],row["volume"]]
+            # print(stock_shin)
             all_id_name.append(stock_shin_id_name)
             all_stocks_shin.append(stock_shin)
+            # print(all_stocks_shin)
             new_id.append(int(str(row["stockid"]).strip()))
     except:
         pass
-
-
+    
+    # quit()
     # print("----new_id------")
     # print(new_id)
     df = pd.DataFrame(all_stocks_shin)
+    # print(df)
+    # quit()
     df_id_name = pd.DataFrame(all_id_name)
     
     
     df.columns = ["stockid","stockname","over","open","high","low","bef","volume"]
     df_id_name.columns = ["stockid","stockname"]
     df['up_date'] = now_day
-    
+
 # str轉為字串,strip去掉前後的空白
-    df['open'] = df['open'].str.strip()
-    df['high'] = df['high'].str.strip()
-    df['low'] = df['low'].str.strip()
-    df['over'] = df['over'].str.strip()
-    df['volumn'] = df['volumn'].str.strip() 
+    if (is_string_dtype(df['open'])):
+        df['open'] = df['open'].str.strip()
+    if (is_string_dtype(df['high'])):
+        df['high'] = df['high'].str.strip()
+    if (is_string_dtype(df['low'])):
+        df['low'] = df['low'].str.strip()
+    if (is_string_dtype(df['over'])):
+        df['over'] = df['over'].str.strip()
+    if (is_string_dtype(df['bef'])):
+        df['bef'] = df['bef'].str.strip()
+    if (is_string_dtype(df['volume'])):
+        df['volume'] = df['volume'].str.strip()
         
     # 將值為"-"的內容換成bef的值或0
     df.loc[df['high']=="-",['high','low','over']] = df.loc[df['high']=="-",'bef']
-    df.loc[df['volumn']=="-",'volumn'] = 0
-    df['up_date'] = now_day
+    df.loc[df['open']=="-",'open'] = df.loc[df['open']=="-",'over']
+    df.loc[df['bef']=="-",'bef'] = df.loc[df['bef']=="-",'over']
     
+
+    df.loc[df['volume']=="-",'volume'] = 0
+    # print(df)
+    # print(df.info())
+    # quit()
+    df = df.astype(
+                {
+                    'stockid':'int16',
+                    'stockname':'category',
+                    'over':'float32',
+                    'open':'float32',
+                    'high':"float32",
+                    'low':"float32",
+                    'bef':"float32",
+                    "volume":"int64",
+                    "up_date":"datetime64[ns]"
+                }
+            )
 
 
     newup = [x for x in new_id if x not in old_stocks]
@@ -166,7 +205,7 @@ while True:
                 'high': Float,
                 'low': Float,
                 'bef': Float,
-                'volumn': Integer,
+                'volume': Integer,
                 'up_date' : DATE,
                 }
 
@@ -187,15 +226,18 @@ while True:
 
     # 建立新df做每日報表
     # 以後加入創新高個股名單
+    new_stocks=""
     if newup == [] :
-        newup = "Today no new stock"
+        new_stocks = "Today no new stocks"
+    else:
+        for new_one in newup:
+            new_stocks = new_stocks+","+str(new_one)
+
     onedaytype = {
         "Up_date" : DATE,
         "New_up" : NVARCHAR(length=1000),
-    }
-    new_stocks = "news" 
-    for new_one in newup:
-        new_stocks = new_stocks+","+new_one
+        }
+    
     a_day = {
         "Up_date" : now_day,
         "New_up" : new_stocks
@@ -211,7 +253,7 @@ while True:
     
     x = x+1
     # 休息五秒進行下一日
-    time.sleep(10)
+    time.sleep(20)
 
 
 
