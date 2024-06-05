@@ -140,8 +140,10 @@ while True:
         
     # 將值為"-"的內容換成bef的值或0
     df.loc[df['high']=="-",['high','low','over']] = df.loc[df['high']=="-",'bef']
-    df.loc[df['open']=="-",'open'] = df.loc[df['open']=="-",'over']
-    df.loc[df['bef']=="-",'bef'] = df.loc[df['bef']=="-",'over']
+    # 這兩種寫法,以後的pandas不支援
+    if (is_string_dtype(df['bef'])):
+        df.loc[df['open']=="-",'open'] = df.loc[df['open']=="-",'over']
+        df.loc[df['bef']=="-",'bef'] = df.loc[df['bef']=="-",'over']
     
 
     df.loc[df['volume']=="-",'volume'] = 0
@@ -193,7 +195,7 @@ while True:
         server.close() #發送完成後關閉連線
     # print(newup)
     # 將新上興櫃的股票寫入文字檔中
-    with open("newup_stock.txt","w") as file:
+    with open("newshin_stock.txt","w") as file:
         for new_s in newup :
             file.write(str(new_s)+"\n")
 

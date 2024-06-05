@@ -165,7 +165,7 @@ while True:
         print(f"{upnewd}今日無新股上櫃")
     # print(newup)
     # 將新上興櫃的股票寫入文字檔中
-    with open("newup_stockup.txt","w") as file:
+    with open("newup_stock.txt","w") as file:
         for new_s in newup :
             # int不可和str相加
             file.write(str(new_s)+"\n")
