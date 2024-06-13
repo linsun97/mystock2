@@ -10,6 +10,9 @@ import email.message
 from pandas.api.types import is_string_dtype
 from pandas.api.types import is_numeric_dtype
 
+# 上櫃即時創新高 csv版與html版
+# https://www.tpex.org.tw/web/stock/aftertrading/daily_close_quotes/stk_quote_result.php?l=zh-tw&o=csv&d=113/06/07&s=0,asc,0
+# https://www.tpex.org.tw/web/stock/aftertrading/daily_close_quotes/stk_quote_result.php?l=zh-tw&o=htm&d=113/06/07&s=0,asc,0
 # 設定float格式為小數點後兩位
 pd.set_option("display.float_format",'{:.2f}'.format)
 today = datetime.today().date()
@@ -228,4 +231,4 @@ while True:
     
     x = x+1
     # 休息五秒進行下一日
-    time.sleep(2)
+    time.sleep(10)

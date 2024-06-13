@@ -7,8 +7,9 @@ import email.message
 import time
 from pandas.api.types import is_string_dtype
 from pandas.api.types import is_numeric_dtype
-# 只抓上市的創新版
+# 只抓上市的創新版 html與csv
 # https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date=20240603&response=html
+# https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date=20240603&response=csv
 
 # 設定float格式為小數點後兩位
 pd.set_option("display.float_format",'{:.2f}'.format)
@@ -224,7 +225,7 @@ while True:
         x = x+1
         timegap = 0
         # 休息五秒進行下一日
-        time.sleep(2)
+        time.sleep(5)
 
 
 
