@@ -11,6 +11,9 @@ engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3
 onedaytype = {
         "Up_date" : DATE,
         "New_up" : NVARCHAR(length=8000),
+        "day1_high" : NVARCHAR(length=2000),
+        "day2_high" : NVARCHAR(length=2000),
+        "day3_high" : NVARCHAR(length=2000)
     }
 a_day = {
         "Up_date" : datetime.date(2024,5,1),

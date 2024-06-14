@@ -36,10 +36,15 @@ def newhigh(nprice,nstockid,nstockname,nvolume,day1,day2,day3):
         df_head3 = df_id_nh.head(day3) 
 
         day1max = df_head1['over'].max()
+        print("30day high")
+        print(day1max)
         day2max = df_head2['over'].max()
         day3max = df_head3['over'].max()
 
         day1mean = df_head1['volume'].mean()
+
+        print("nowprice:")
+        print(nprice)
         
         if nprice >= day1max:
             print(f"{nstockid},{nstockname}創{day1}天新高")
@@ -80,6 +85,12 @@ except:
 x = 1
 timegap = 0
 while True:
+    h_day1 = []
+    h_id_day1=[]
+    h_day2 = []
+    h_id_day2=[]
+    h_day3 = []
+    h_id_day3=[]
     old_stocks = []
     try:
         old_df = pd.read_sql('select stockid from all_id_name_shin',engine)
@@ -126,6 +137,9 @@ while True:
         onedaytype = {
         "Up_date" : DATE,
         "New_up" : NVARCHAR(length=1000),
+        "day1_high" : NVARCHAR(length=2000),
+        "day2_high" : NVARCHAR(length=2000),
+        "day3_high" : NVARCHAR(length=2000)
         }
         a_day = {
             "Up_date" : now_day,
@@ -278,9 +292,13 @@ while True:
             row_pd = pd.DataFrame([row])
             # --------------------------
             nowstockid = row_pd.iloc[0,0] 
+            print(nowstockid)
             nowname = row_pd.iloc[0,1] 
+            print(nowname)
             nowprice = row_pd.iloc[0,2]
+            print(nowprice)
             nowvolume = row_pd.iloc[0,7]
+            print(nowvolume)
             newhigh(nowprice,nowstockid,nowname,nowvolume,30,60,90)
             # -------------------------------------
 
@@ -300,8 +318,9 @@ while True:
     if newup == [] :
         new_stocks = "Today no new stocks"
     else:
-        for new_one in newup:
-            new_stocks = new_stocks+","+str(new_one)
+        # for new_one in newup:
+        #     new_stocks = new_stocks+","+str(new_one)
+        new_stocks = ",".join(map(str, newup))
 
     onedaytype = {
         "Up_date" : DATE,

@@ -18,6 +18,65 @@ today = datetime.today().date()
 
 #第一次先執行start_shin.py才能,只要執行一次就好,設定起始日
 engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3306/stock")
+
+# -----偵測創新高的函數--------------------------------------------
+# 這樣做h_day1,h_id_day1會變成全域變數
+h_day1 = []
+h_id_day1=[]
+h_day2 = []
+h_id_day2=[]
+h_day3 = []
+h_id_day3=[]
+
+def newhigh(nprice,nstockid,nstockname,nvolume,day1,day2,day3):
+    pd.set_option("display.float_format",'{:.2f}'.format)
+    try:
+        df_list = pd.read_sql(f"SELECT * FROM st_{nstockid} ORDER BY up_date DESC LIMIT 150",engine )
+        df_id_nh = pd.DataFrame(df_list)
+        df_head1 = df_id_nh.head(day1) 
+        df_head2 = df_id_nh.head(day2) 
+        df_head3 = df_id_nh.head(day3) 
+
+        day1max = df_head1['over'].max()
+        # print("30day high")
+        # print(day1max)
+        day2max = df_head2['over'].max()
+        day3max = df_head3['over'].max()
+
+        day1mean = df_head1['volume'].mean()
+
+        # print("nowprice:")
+        # print(nprice)
+        
+        if nprice >= day1max:
+            print(f"{nstockid},{nstockname}創{day1}天新高")
+            # 取到小數點後兩位
+            volume_day1 = round(nvolume/day1mean,2)
+            print(f"成交量是平均值的{volume_day1}倍")
+            h_day1.append(f"{nstockid}({nstockname})")
+            h_id_day1.append(f"{nstockid}")
+            # print("now high stocks:")
+            # print(h_id_day1)
+
+        # newh_day2 = []
+        if nprice >= day2max:
+            print(f"{nstockid},{nstockname}創{day2}天新高")
+            h_day2.append(f"{nstockid}({nstockname})")
+            h_id_day2.append(f"{nstockid}")
+
+        # newh_day3 = []
+        if nprice >= day3max:
+            print(f"{nstockid},{nstockname}創{day3}天新高")
+            h_day3.append(f"{nstockid}({nstockname})")
+            h_id_day3.append(f"{nstockid}")
+    
+    except Exception as e:
+        print(e)
+        pass
+    
+# --------偵測創新高的函數結束--------------------------------------------------
+
+
 try:
     last_date = pd.read_sql("SELECT Up_date FROM sum_oneday ORDER BY Up_date DESC LIMIT 1",engine)
     last_date = last_date.iloc[0,0]
@@ -28,6 +87,12 @@ except:
 x = 1
 timegap = 0
 while True:
+    h_day1 = []
+    h_id_day1=[]
+    h_day2 = []
+    h_id_day2=[]
+    h_day3 = []
+    h_id_day3=[]
     old_stocks = []
     try:
         old_df = pd.read_sql('select stockid from all_id_name_sum',engine)
@@ -83,6 +148,9 @@ while True:
         onedaytype = {
         "Up_date" : DATE,
         "New_up" : NVARCHAR(length=1000),
+        "day1_high" : NVARCHAR(length=2000),
+        "day2_high" : NVARCHAR(length=2000),
+        "day3_high" : NVARCHAR(length=2000)
         }
         a_day = {
             "Up_date" : now_day,
@@ -93,7 +161,7 @@ while True:
         print(df_day)
         df_day.to_sql('sum_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
         timegap = 1
-        time.sleep(5)
+        time.sleep(1)
         continue
     
     else:
@@ -120,6 +188,9 @@ while True:
                     "up_date":"datetime64[ns]"
                 }
             )
+        
+
+
         df_id_name = data_s.iloc[:,[0,1]]
         # 用兩層中掛號,從series變成dataframe
         new_id = data_s["stockid"].tolist()
@@ -132,7 +203,7 @@ while True:
         # 將值為"-"的內容換成bef的值或0
         data_s.loc[data_s['high']=="0",['high','low','over','open']] = data_s.loc[data_s['high']=="0",'bef']
 
-
+# -------------------------------------------------------------------
         newup = [x for x in new_id if x not in old_stocks]
         # 如果有新股上市寄郵件通知自己
         if newup != []:
@@ -167,6 +238,8 @@ while True:
             for new_s in newup :
                 file.write(str(new_s)+"\n")
 
+# -------------------------------------------------------------------
+
         dtypedict = {
                     'stockid': Integer,
                     'stockname': NVARCHAR(length=100),
@@ -189,10 +262,27 @@ while True:
         def IntoTable(row):
                 # 把row從series變dataframe,取出的row會被當成series但他是直行,先變成list,再變成橫的dataframe
                 row_pd = pd.DataFrame([row])
+                # --------------------------
+                nowstockid = row_pd.iloc[0,0]
+                # print(nowstockid) 
+                nowname = row_pd.iloc[0,1]
+                # print(nowname) 
+                nowprice = row_pd.iloc[0,2]
+                # print(nowprice)
+                nowvolume = row_pd.iloc[0,7]
+                # print(nowvolume)
+                newhigh(nowprice,nowstockid,nowname,nowvolume,30,60,90)
+                # -------------------------------------
                 row_pd.to_sql(f'st_{row_pd.iloc[0,0]}', engine, if_exists='append', dtype=dtypedict ,index=False  )
                 print(f"新增st_{row_pd.iloc[0,0]}資料表成功,股名:{row_pd.iloc[0,1]}")
             # 可以用df.apply的方法加上axis = 1,就可以把df內每一列當成一個row去執行IntoTable函式
         data_s.apply(IntoTable,axis = 1)
+
+        # ------------------------------------------------
+        newh_day1_str = ",".join(map(str, h_id_day1))
+        newh_day2_str = ",".join(map(str, h_id_day2))
+        newh_day3_str = ",".join(map(str, h_id_day3))
+
 
         # 建立新df做每日報表
         # 以後加入創新高個股名單
@@ -200,17 +290,24 @@ while True:
         if newup == [] :
             new_stocks = "Today no new stocks"
         else:
-            for new_one in newup:
-                new_stocks = new_stocks+","+str(new_one)
+            # for new_one in newup:
+            #     new_stocks = new_stocks+","+str(new_one)
+            new_stocks = ",".join(map(str, newup))
 
         onedaytype = {
             "Up_date" : DATE,
             "New_up" : NVARCHAR(length=1000),
+            "day1_high" : NVARCHAR(length=2000),
+            "day2_high" : NVARCHAR(length=2000),
+            "day3_high" : NVARCHAR(length=2000)
             }
         
         a_day = {
             "Up_date" : now_day,
-            "New_up" : new_stocks
+            "New_up" : new_stocks,
+            "day1_high" : newh_day1_str,
+            "day2_high" : newh_day2_str,
+            "day3_high" : newh_day3_str
         }
 
         # 必須設index
