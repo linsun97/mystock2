@@ -36,15 +36,15 @@ def newhigh(nprice,nstockid,nstockname,nvolume,day1,day2,day3):
         df_head3 = df_id_nh.head(day3) 
 
         day1max = df_head1['over'].max()
-        print("30day high")
-        print(day1max)
+        # print("30day high")
+        # print(day1max)
         day2max = df_head2['over'].max()
         day3max = df_head3['over'].max()
 
         day1mean = df_head1['volume'].mean()
 
-        print("nowprice:")
-        print(nprice)
+        # print("nowprice:")
+        # print(nprice)
         
         if nprice >= day1max:
             print(f"{nstockid},{nstockname}創{day1}天新高")
@@ -134,22 +134,22 @@ while True:
         
     except:
         print(f"{upnewd}(星期{week_day})今天可能是假日")
-        onedaytype = {
-        "Up_date" : DATE,
-        "New_up" : NVARCHAR(length=1000),
-        "day1_high" : NVARCHAR(length=2000),
-        "day2_high" : NVARCHAR(length=2000),
-        "day3_high" : NVARCHAR(length=2000)
-        }
-        a_day = {
-            "Up_date" : now_day,
-            "New_up" : "holiday"
-        }
+        # onedaytype = {
+        # "Up_date" : DATE,
+        # "New_up" : NVARCHAR(length=1000),
+        # "day1_high" : NVARCHAR(length=2000),
+        # "day2_high" : NVARCHAR(length=2000),
+        # "day3_high" : NVARCHAR(length=2000)
+        # }
+        # a_day = {
+        #     "Up_date" : now_day,
+        #     "New_up" : "holiday"
+        # }
 
-        # 必須設index
-        df_day = pd.DataFrame(a_day, index=[0])
-        print(df_day)
-        df_day.to_sql('shin_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
+        # # 必須設index
+        # df_day = pd.DataFrame(a_day, index=[0])
+        # print(df_day)
+        # df_day.to_sql('shin_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
         
         timegap = 1
         continue
@@ -215,9 +215,14 @@ while True:
     
 
     df.loc[df['volume']=="-",'volume'] = 0
-    # print(df)
-    # print(df.info())
-    # quit()
+    df['kwave'] = 0.0
+    df['rci'] = 0.0
+    df['updown'] = 0.0
+    df['kwr'] = 0.0
+    # 50天相對強度
+    df['pc'] = 0.0
+    df['rs'] = 0.0
+    df['nh'] = ''
     df = df.astype(
                 {
                     'stockid':'int16',
@@ -228,10 +233,19 @@ while True:
                     'low':"float32",
                     'bef':"float32",
                     "volume":"int64",
-                    "up_date":"datetime64[ns]"
+                    "up_date":"datetime64[ns]",
+                    "kwave" : "float32",
+                    "rci" : "float32",
+                    "updown" : "float32",
+                    "kwr" : "float32",
+                    "pc" : "float32",
+                    "rs" : "float32",
+                    "nh" : 'category'
                 }
             )
-
+    df.loc[df['over'] < df['open'],'kwave'] = abs(df['open']-df['over'])+abs(df['open']-df['high'])+abs(df['high']-df['low'])+abs(df['low']-df['over'])
+    df.loc[df['over'] >= df['open'],'kwave'] = abs(df['open']-df['over'])+abs(df['open']-df['low'])+abs(df['low']-df['high'])+abs(df['high']-df['over'])
+    
 # -------------------------------------------------------------------
     newup = [x for x in new_id if x not in old_stocks]
     # 如果有新股上市寄郵件通知自己
@@ -263,9 +277,9 @@ while True:
         server.close() #發送完成後關閉連線
     # print(newup)
     # 將新上興櫃的股票寫入文字檔中
-    with open("newshin_stock.txt","w") as file:
-        for new_s in newup :
-            file.write(str(new_s)+"\n")
+    # with open("newshin_stock.txt","w") as file:
+    #     for new_s in newup :
+    #         file.write(str(new_s)+"\n")
 
 # -------------------------------------------------------------
     dtypedict = {
@@ -278,6 +292,13 @@ while True:
                 'bef': Float,
                 'volume': Integer,
                 'up_date' : DATE,
+                'kwave': Float,
+                "rci" : Float,
+                "updown" : Float,
+                "kwr" : Float,
+                "pc" : Float,
+                "rs" : Float,
+                "nh" : NVARCHAR(length=100),
                 }
 
     d_id_dtype = {
@@ -292,15 +313,25 @@ while True:
             row_pd = pd.DataFrame([row])
             # --------------------------
             nowstockid = row_pd.iloc[0,0] 
-            print(nowstockid)
+            # print(nowstockid)
             nowname = row_pd.iloc[0,1] 
-            print(nowname)
+            # print(nowname)
             nowprice = row_pd.iloc[0,2]
-            print(nowprice)
+            # print(nowprice)
             nowvolume = row_pd.iloc[0,7]
-            print(nowvolume)
+            # print(nowvolume)
             newhigh(nowprice,nowstockid,nowname,nowvolume,30,60,90)
             # -------------------------------------
+            if str(row_pd.iloc[0,0]) in h_id_day1:
+                row_pd['nh'] = '30up'
+            if str(row_pd.iloc[0,0]) in h_id_day2:
+                row_pd['nh'] = '3060up'
+            if str(row_pd.iloc[0,0]) in h_id_day3:
+                row_pd['nh'] = '306090up'
+
+            # print(h_id_day1)
+            # print(row_pd)
+            # quit()
 
             row_pd.to_sql(f'st_{row_pd.iloc[0,0]}', engine, if_exists='append', dtype=dtypedict ,index=False  )
             print(f"新增st_{row_pd.iloc[0,0]}資料表成功,股名:{row_pd.iloc[0,1]}")
@@ -348,7 +379,7 @@ while True:
     
     x = x+1
     # 休息五秒進行下一日
-    time.sleep(2)
+    time.sleep(1)
 
 
 

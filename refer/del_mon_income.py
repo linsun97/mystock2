@@ -1,3 +1,3 @@
 from del_dbtable import DelDbTable
 
-DelDbTable("stock","mon_income_")
+DelDbTable("stock","net_stocks_")

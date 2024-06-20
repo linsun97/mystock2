@@ -145,21 +145,21 @@ while True:
     # quit()
         print(f"{upnewd}(星期{week_day})今天可能是假日")
         
-        onedaytype = {
-        "Up_date" : DATE,
-        "New_up" : NVARCHAR(length=1000),
-        "day1_high" : NVARCHAR(length=2000),
-        "day2_high" : NVARCHAR(length=2000),
-        "day3_high" : NVARCHAR(length=2000)
-        }
-        a_day = {
-            "Up_date" : now_day,
-            "New_up" : "holiday"
-        }
-        # 必須設index
-        df_day = pd.DataFrame(a_day, index=[0])
-        print(df_day)
-        df_day.to_sql('sum_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
+        # onedaytype = {
+        # "Up_date" : DATE,
+        # "New_up" : NVARCHAR(length=1000),
+        # "day1_high" : NVARCHAR(length=2000),
+        # "day2_high" : NVARCHAR(length=2000),
+        # "day3_high" : NVARCHAR(length=2000)
+        # }
+        # a_day = {
+        #     "Up_date" : now_day,
+        #     "New_up" : "holiday"
+        # }
+        # # 必須設index
+        # df_day = pd.DataFrame(a_day, index=[0])
+        # print(df_day)
+        # df_day.to_sql('sum_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
         timegap = 1
         time.sleep(1)
         continue

@@ -195,7 +195,6 @@ while True:
     # 50天相對強度
     df['pc'] = 0.0
     df['rs'] = 0.0
-    df['nh'] = ''
     df = df.astype(
                 {
                     'stockid':'int16',
@@ -213,7 +212,6 @@ while True:
                     "kwr" : "float32",
                     "pc" : "float32",
                     "rs" : "float32",
-                    "nh" : 'category'
                 }
             )
     
@@ -285,7 +283,6 @@ while True:
             "kwr" : Float,
             "pc" : Float,
             "rs" : Float,
-            "nh" : NVARCHAR(length=100),
             }
 
     d_id_dtype = {
@@ -294,7 +291,7 @@ while True:
             }
         
         # 設定欄位名稱,若沒設定預設是用0,1,2,3....當欄位名稱
-    df_id_name.to_sql('all_id_name', engine, if_exists='replace',dtype=d_id_dtype,index=False)    
+    # df_id_name.to_sql('all_id_name', engine, if_exists='replace',dtype=d_id_dtype,index=False)    
 
         # sql_df = pd.read_sql('all_stocks_shin', engine)
     def IntoTable(row):
@@ -310,15 +307,15 @@ while True:
         nowvolume = row_pd.iloc[0,7]
         # print(nowvolume)
         newhigh(nowprice,nowstockid,nowname,nowvolume,60,90,120)
-        if str(row_pd.iloc[0,0]) in h_id_day1:
-                row_pd['nh'] = '30up'
-        if str(row_pd.iloc[0,0]) in h_id_day2:
-            row_pd['nh'] = '3060up'
-        if str(row_pd.iloc[0,0]) in h_id_day3:
-            row_pd['nh'] = '306090up'
         # -------------------------------------
-        row_pd.to_sql(f'st_{row_pd.iloc[0,0]}', engine, if_exists='append', dtype=dtypedict ,index=False  )
-        print(f"新增st_{row_pd.iloc[0,0]}資料表成功,股名:{row_pd.iloc[0,1]}")
+        if nowstockid == 6617:
+            print(row_pd)
+            try:
+                row_pd.to_sql(f'st_{row_pd.iloc[0,0]}', engine, if_exists='append', dtype=dtypedict ,index=False  )
+            except Exception as e :
+                print(e)
+            
+        # print(f"新增st_{row_pd.iloc[0,0]}資料表成功,股名:{row_pd.iloc[0,1]}")
     # 可以用df.apply的方法加上axis = 1,就可以把df內每一列當成一個row去執行IntoTable函式
     df.apply(IntoTable,axis = 1)
 
@@ -355,11 +352,11 @@ while True:
     # 必須設index
     df_day = pd.DataFrame(a_day, index=[0])
     print(df_day)
-    df_day.to_sql('sup_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
+    # df_day.to_sql('sup_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
 
     if now_day == today:
         break
     
     x = x+1
     # 休息五秒進行下一日
-    time.sleep(1)
+    time.sleep(2)

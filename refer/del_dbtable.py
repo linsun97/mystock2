@@ -10,7 +10,7 @@ import mariadb
 def DelDbTable(del_db_name,del_db_tbstr):
     # print(del_db_name) 要刪的資料庫名稱
     # print(del_db_tbstr) 要刪的資料表名稱內含的關鍵字
-    engine = create_engine(f"mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3306/{del_db_name}", pool_size=20, max_overflow=40) #一次可以刪多一點
+    engine = create_engine(f"mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3306/{del_db_name}", pool_size=100, max_overflow=100) #一次可以刪多一點
     # engine = sqlalchemy.create_engine("mariadb+mariadbconnector://root:nineseve9173!@127.0.0.1:3306/stock")
     inspector = inspect(engine)
     schemas = inspector.get_schema_names()
