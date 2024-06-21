@@ -7,6 +7,7 @@ import email.message
 import time
 from pandas.api.types import is_string_dtype
 from pandas.api.types import is_numeric_dtype
+import schedule
 # 只抓上市的創新版 html與csv
 # https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date=20240603&response=html
 # https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date=20240603&response=csv
@@ -19,38 +20,55 @@ today = datetime.today().date()
 
 #第一次先執行start_shin.py才能,只要執行一次就好,設定起始日
 engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3306/stock")
-try:
-    last_date = pd.read_sql("SELECT Up_date FROM sum_oneday ORDER BY Up_date DESC LIMIT 1",engine)
-    last_date = last_date.iloc[0,0]
-except:   
-    pass
-
-# 若當天沒有資料往前一直到有資料當天
-x = 1
-timegap = 0
-while True:
-    old_stocks = []
+# -----偵測創新高的函數--------------------------------------------
+def newhigh(nprice,nstockid,nstockname,nvolume,day1,day2,day3):
+    pd.set_option("display.float_format",'{:.2f}'.format)
     try:
-        old_df = pd.read_sql('select stockid from all_id_name_sum',engine)
-        old_stocks = old_df['stockid'].tolist() # 把series變成list
-        # print(old_stocks)
-        # quit()
+        df_list = pd.read_sql(f"SELECT * FROM st_{nstockid} ORDER BY up_date DESC LIMIT 150",engine )
+        df_id_nh = pd.DataFrame(df_list)
+        df_head1 = df_id_nh.head(day1) 
+        df_head2 = df_id_nh.head(day2) 
+        df_head3 = df_id_nh.head(day3) 
+
+        day1max = df_head1['over'].max()
+        day2max = df_head2['over'].max()
+        day3max = df_head3['over'].max()
+
+        day1mean = df_head1['volume'].mean()
+        
+        if nprice >= day1max:
+            print(f"{nstockid},{nstockname}創{day1}天新高")
+            # 取到小數點後兩位
+            volume_day1 = round(nvolume/day1mean,2)
+            print(f"成交量是平均值的{volume_day1}倍")
+            h_day1.append(f"{nstockid}({nstockname})")
+            h_id_day1.append(f"{nstockid}")
+
+        # newh_day2 = []
+        if nprice >= day2max:
+            print(f"{nstockid},{nstockname}創{day2}天新高")
+            h_day2.append(f"{nstockid}({nstockname})")
+            h_id_day2.append(f"{nstockid}")
+
+        # newh_day3 = []
+        if nprice >= day3max:
+            print(f"{nstockid},{nstockname}創{day3}天新高")
+            h_day3.append(f"{nstockid}({nstockname})")
+            h_id_day3.append(f"{nstockid}")
+    
     except Exception as e:
         print(e)
         pass
+    
+# --------偵測創新高的函數結束--------------------------------------------------
 
-    x = x+timegap
-    now_day = last_date + timedelta(days=x) 
-    # weekday : 0-6,sunday為6, isoweekday : 1-7 sunday為7
-    # week_day = datetime.weekday(now_day)
-    week_day = datetime.isoweekday(now_day)
-    upnewd = datetime.strftime(now_day, '%Y%m%d')
+def detect_nh():
+    week_day = datetime.isoweekday(today)
+    upnewd = datetime.strftime(today, '%Y%m%d')
     # if week_day == 5 or week_day == 6: #星期六或星期日
     #     continue
     # 測試用:
     # upnewd = "20240519"
-    if now_day > today :
-        quit()
 
     url = f"https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date={upnewd}&response=html"
     print(url)
@@ -81,21 +99,7 @@ while True:
     # quit()
         print(f"{upnewd}(星期{week_day})今天可能是假日")
         
-        onedaytype = {
-        "Up_date" : DATE,
-        "New_up" : NVARCHAR(length=1000),
-        }
-        a_day = {
-            "Up_date" : now_day,
-            "New_up" : "holiday"
-        }
-        # 必須設index
-        df_day = pd.DataFrame(a_day, index=[0])
-        print(df_day)
-        df_day.to_sql('sum_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
-        timegap = 1
-        time.sleep(5)
-        continue
+        pass
     
     else:
         # quit()
@@ -107,7 +111,6 @@ while True:
         data_s = data_s.reindex(columns=["stockid","stockname","over", "open", "high", "low","bef","volume"]) 
 
         data_s = data_s.fillna(0)
-        data_s["up_date"] = now_day
         data_s = data_s.astype(
                 {
                     'stockid':'int16',
@@ -118,12 +121,8 @@ while True:
                     'low':"float32",
                     'over':'float32',
                     'bef':"float32",
-                    "up_date":"datetime64[ns]"
                 }
             )
-        df_id_name = data_s.iloc[:,[0,1]]
-        # 用兩層中掛號,從series變成dataframe
-        new_id = data_s["stockid"].tolist()
         # print(data_s)
         # print(data_s.info())
         # print(df_id_name)
@@ -132,100 +131,57 @@ while True:
         
         # 將值為"-"的內容換成bef的值或0
         data_s.loc[data_s['high']=="0",['high','low','over','open']] = data_s.loc[data_s['high']=="0",'bef']
+        def onerow_nh(row):
+            # 把row從series變dataframe,取出的row會被當成series但他是直行,先變成list,再變成橫的dataframe
+            row_pd = pd.DataFrame([row])
+            nowstockid = row_pd.iloc[0,0]
+            nowname = row_pd.iloc[0,1]
+            nowprice = row_pd.iloc[0,2]
+            nowvolume = row_pd.iloc[0,6]
+            newhigh(nowprice,nowstockid,nowname,nowvolume,30,60,90)
+    
+    data_s.apply(onerow_nh,axis = 1)
 
 
-        newup = [x for x in new_id if x not in old_stocks]
-        # 如果有新股上市寄郵件通知自己
-        if newup != []:
-            msg=email.message.EmailMessage()
-            #利用物件建立基本設定
-            from_a = "linsun97@gmail.com"
-            to_b = "linsun97@gmail.com"
 
-            msg["From"]=from_a
-            msg["To"]=to_b
-            msg["Subject"]="上市創新版新增股票"
-            content = ''
-            for new_s in newup :
-                content = content + f"<a href='http://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={new_s}&year=&seamon=&mtype=B&'>{new_s}的公開說明書</a><br>" + \
-                                    f"<a href='https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={new_s}'>{new_s}的goodinfo</a><br>" +\
-                                    f"<a href='https://mops.twse.com.tw/mops/web/t100sb07_1'>法說會簡報下載</a><br><br>"
-            #寄送郵件主要內容
-            msg.add_alternative(content,subtype="html") #HTML信件內容
-            acc = "linsun97"
-            password = "eajzbxiterroviom"
+# 這樣做h_day1,h_id_day1會變成全域變數
+h_day1 = []
+h_id_day1=[]
+h_day2 = []
+h_id_day2=[]
+h_day3 = []
+h_id_day3=[]
 
-            #連線到SMTP Sevver
-            import smtplib
-            #可以從網路上找到主機名稱和連線埠
-            server=smtplib.SMTP_SSL("smtp.gmail.com",465) #建立gmail連驗
-            server.login(acc,password)
-            server.send_message(msg)
-            server.close() #發送完成後關閉連線
-        # print(newup)
-        # 將新上興櫃的股票寫入文字檔中
-        with open("newum_stock.txt","w") as file:
-            for new_s in newup :
-                file.write(str(new_s)+"\n")
+# ----自動執行-----------------------------------------
+    
+schedule.every(5).minutes.do(detect_nh)
+schedule.every().day.at("09:00").do(detect_nh)
 
-        dtypedict = {
-                    'stockid': Integer,
-                    'stockname': NVARCHAR(length=100),
-                    'over':Float,
-                    'open': Float,
-                    'high': Float,
-                    'low': Float,
-                    'bef': Float,
-                    'volume': Integer,
-                    'up_date' : DATE,
-                    }
+def job_cancel():
+    global running
+    running = False
+    print("Stopped")
+    return schedule.clear()
 
-        d_id_dtype = {
-                'stockid': Integer,
-                'stockname': NVARCHAR(length=100)
-                }
-        # 設定欄位名稱,若沒設定預設是用0,1,2,3....當欄位名稱
-        df_id_name.to_sql('all_id_name_sum', engine, if_exists='replace',dtype=d_id_dtype,index=False)    
-        
-        def IntoTable(row):
-                # 把row從series變dataframe,取出的row會被當成series但他是直行,先變成list,再變成橫的dataframe
-                row_pd = pd.DataFrame([row])
-                row_pd.to_sql(f'st_{row_pd.iloc[0,0]}', engine, if_exists='append', dtype=dtypedict ,index=False  )
-                print(f"新增st_{row_pd.iloc[0,0]}資料表成功,股名:{row_pd.iloc[0,1]}")
-            # 可以用df.apply的方法加上axis = 1,就可以把df內每一列當成一個row去執行IntoTable函式
-        data_s.apply(IntoTable,axis = 1)
+schedule.every().day.at('15:00').do(job_cancel)
 
-        # 建立新df做每日報表
-        # 以後加入創新高個股名單
-        new_stocks=""
-        if newup == [] :
-            new_stocks = "Today no new stocks"
-        else:
-            for new_one in newup:
-                new_stocks = new_stocks+","+str(new_one)
+while True:
 
-        onedaytype = {
-            "Up_date" : DATE,
-            "New_up" : NVARCHAR(length=1000),
-            }
-        
-        a_day = {
-            "Up_date" : now_day,
-            "New_up" : new_stocks
-        }
+    schedule.run_pending()
+    if not schedule.jobs:
+        break
+    time.sleep(1)
 
-        # 必須設index
-        df_day = pd.DataFrame(a_day, index=[0])
-        print(df_day)
-        df_day.to_sql('sum_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
+print("Today is end!!")
 
-        if now_day == today:
-            break
-        
-        x = x+1
-        timegap = 0
-        # 休息五秒進行下一日
-        time.sleep(5)
+
+
+# detect_nh()
+# print(h_id_day1)
+# 串列轉為字串,用","分隔
+# newh_day1_str = ",".join(map(str, h_id_day1))
+# print(newh_day1_str)
+# quit()
 
 
 
