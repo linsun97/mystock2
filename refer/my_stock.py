@@ -215,6 +215,7 @@ while True:
     
 
     df.loc[df['volume']=="-",'volume'] = 0
+    df['volume'] = round(df['volume']/1000,2)
     df['kwave'] = 0.0
     df['rci'] = 0.0
     df['updown'] = 0.0
@@ -232,7 +233,7 @@ while True:
                     'high':"float32",
                     'low':"float32",
                     'bef':"float32",
-                    "volume":"int64",
+                    "volume":"float32",
                     "up_date":"datetime64[ns]",
                     "kwave" : "float32",
                     "rci" : "float32",
@@ -290,7 +291,7 @@ while True:
                 'high': Float,
                 'low': Float,
                 'bef': Float,
-                'volume': Integer,
+                'volume': Float,
                 'up_date' : DATE,
                 'kwave': Float,
                 "rci" : Float,
@@ -356,9 +357,9 @@ while True:
     onedaytype = {
         "Up_date" : DATE,
         "New_up" : NVARCHAR(length=1000),
-        "day1_high" : NVARCHAR(length=2000),
-        "day2_high" : NVARCHAR(length=2000),
-        "day3_high" : NVARCHAR(length=2000)
+        "day1_high" : NVARCHAR(length=10000),
+        "day2_high" : NVARCHAR(length=10000),
+        "day3_high" : NVARCHAR(length=10000)
         }
     
     a_day = {
@@ -379,7 +380,7 @@ while True:
     
     x = x+1
     # 休息五秒進行下一日
-    time.sleep(1)
+    time.sleep(2)
 
 
 

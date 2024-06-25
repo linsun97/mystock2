@@ -188,6 +188,7 @@ while True:
 
 
     df.loc[df['high']=="---",["open","high","low","over"]] = df.loc[df["high"]=="---","bef"]
+    df['volume'] = round((df['volume']/1000),2)
     df['kwave'] = 0.0
     df['rci'] = 0.0
     df['updown'] = 0.0
@@ -205,7 +206,7 @@ while True:
                     'high':"float32",
                     'low':"float32",
                     'bef':"float32",
-                    "volume":"int64",
+                    "volume":"float32",
                     "up_date":"datetime64[ns]",
                     "kwave" : "float32",
                     "rci" : "float32",
@@ -277,7 +278,7 @@ while True:
             'high': Float,
             'low': Float,
             'bef': Float,
-            'volumn': Integer,
+            'volumn': Float,
             'up_date' : DATE,
             'kwave': Float,
             "rci" : Float,
@@ -311,11 +312,11 @@ while True:
         # print(nowvolume)
         newhigh(nowprice,nowstockid,nowname,nowvolume,60,90,120)
         if str(row_pd.iloc[0,0]) in h_id_day1:
-                row_pd['nh'] = '30up'
+                row_pd['nh'] = '60up'
         if str(row_pd.iloc[0,0]) in h_id_day2:
-            row_pd['nh'] = '3060up'
+            row_pd['nh'] = '6090up'
         if str(row_pd.iloc[0,0]) in h_id_day3:
-            row_pd['nh'] = '306090up'
+            row_pd['nh'] = '6090120up'
         # -------------------------------------
         row_pd.to_sql(f'st_{row_pd.iloc[0,0]}', engine, if_exists='append', dtype=dtypedict ,index=False  )
         print(f"新增st_{row_pd.iloc[0,0]}資料表成功,股名:{row_pd.iloc[0,1]}")
@@ -340,9 +341,9 @@ while True:
     onedaytype = {
         "Up_date" : DATE,
         "New_up" : NVARCHAR(length=1000),
-        "day1_high" : NVARCHAR(length=2000),
-        "day2_high" : NVARCHAR(length=2000),
-        "day3_high" : NVARCHAR(length=2000)
+        "day1_high" : NVARCHAR(length=10000),
+        "day2_high" : NVARCHAR(length=10000),
+        "day3_high" : NVARCHAR(length=10000)
     }
     a_day = {
         "Up_date" : now_day,
@@ -362,4 +363,4 @@ while True:
     
     x = x+1
     # 休息五秒進行下一日
-    time.sleep(1)
+    time.sleep(2)

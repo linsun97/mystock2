@@ -175,11 +175,12 @@ while True:
 
         data_s = data_s.fillna(0)
         data_s["up_date"] = now_day
+        data_s['volume'] = round(data_s['volume']/1000,2)
         data_s = data_s.astype(
                 {
                     'stockid':'int16',
                     'stockname':'category',
-                    "volume":"int64",
+                    "volume":"float32",
                     'open':'float32',
                     'high':"float32",
                     'low':"float32",
@@ -248,7 +249,7 @@ while True:
                     'high': Float,
                     'low': Float,
                     'bef': Float,
-                    'volume': Integer,
+                    'volume': Float,
                     'up_date' : DATE,
                     }
 
@@ -297,9 +298,9 @@ while True:
         onedaytype = {
             "Up_date" : DATE,
             "New_up" : NVARCHAR(length=1000),
-            "day1_high" : NVARCHAR(length=2000),
-            "day2_high" : NVARCHAR(length=2000),
-            "day3_high" : NVARCHAR(length=2000)
+            "day1_high" : NVARCHAR(length=10000),
+            "day2_high" : NVARCHAR(length=10000),
+            "day3_high" : NVARCHAR(length=10000)
             }
         
         a_day = {

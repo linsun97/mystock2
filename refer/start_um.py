@@ -17,7 +17,10 @@ onedaytype = {
     }
 a_day = {
         "Up_date" : datetime.date(2024,5,1),
-        "New_up" : "nothing"
+        "New_up" : "nothing",
+        "day1_high" : "",
+        "day2_high" : "",
+        "day3_high" : "",
     }
 
     # 必須設index

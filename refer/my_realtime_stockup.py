@@ -60,99 +60,34 @@ def newhigh(nprice,nstockid,nstockname,nvolume,day1,day2,day3):
         pass
     
 # --------偵測創新高的函數結束--------------------------------------------------
-def detect_nh():
-    yearnum = datetime.strftime(today, '%Y')
-    week_day = datetime.isoweekday(today)
-    # if week_day == 5 or week_day == 6: #星期六或星期日
-    #     continue
-    # 算出民國年
-    tynum = int(yearnum) - 1911
-    upnewd = datetime.strftime(today, str(tynum)+'/%m/%d')
 
-    url = f"https://www.tpex.org.tw/web/stock/aftertrading/daily_close_quotes/stk_quote_result.php?l=zh-tw&o=csv&d={upnewd}&s=0,asc" #上櫃公司-政府公開資料
-    print(url)
-    try:
-        data = pd.read_csv(url,usecols=[0,1,2,4,5,6,7,8],thousands=',', encoding='cp950',
-                    names=['stockid','stockname','over','open','high','low','bef','volume'],
-                    #   index_col='stockid',
-                    na_values=["-", " "],skipfooter=8,header=2,
-                    engine="python")
-        # print(data)
-    except:
-        print(f"{upnewd}(星期{week_day})今天可能是假日")
-        # onedaytype = {
-        # "Up_date" : DATE,
-        # "New_up" : NVARCHAR(length=1000),
-        # }
-        # a_day = {
-        #     "Up_date" : now_day,
-        #     "New_up" : "holiday"
-        # }
+import twstock
 
-        # # 必須設index
-        # df_day = pd.DataFrame(a_day, index=[0])
-        # print(df_day)
-        # df_day.to_sql('sup_oneday', engine, if_exists='append', dtype=onedaytype ,index=False  )
-        
-        pass
-    # quit()
-    all_stocks_shin = []
-    try: 
-        for i,row in data.iterrows():
-            if len(row["stockid"]) !=  4 :
-                continue
-            stock_shin = [str(row["stockid"]).strip(),str(row["stockname"]).strip(),row["over"],row["open"],row["high"],row["low"],row["bef"],row["volume"]]
-            all_stocks_shin.append(stock_shin)
-    except:
-        pass
+def detect_new_highs():
+    def process_row(row):
+        stock_id = row["stockid"]
+        # print(f"Processing stock_id: {stock_id}")
+        realtime_stock = twstock.realtime.get(stock_id)
+        if realtime_stock:
+            # print(f"Found data for stock_id: {stock_id}")
+            # print(realtime_stock)
+            name = realtime_stock['info']["name"]
+            if realtime_stock['realtime']["high"] == "-":
+                price = 0.0
+            else:
+                price  = float(realtime_stock['realtime']["high"])
+            # print(f"Latest trade price: {price}")
+            volume = int(realtime_stock['realtime']["accumulate_trade_volume"])
+            # print(f"Accumulated trade volume: {volume}")
+            print(f"Processing newhigh for stock_id: {stock_id}")
+            newhigh(price, stock_id, name, volume, 60, 90, 120)
+            # quit()
+        else:
+            print(f"Data not found for stock_id: {stock_id}")
 
-    # print("----new_id------")
-    # print(new_id)
-    df = pd.DataFrame(all_stocks_shin)
-
-    df.columns = ["stockid","stockname","over","open","high","low","bef","volume"]
-
-# str轉為字串,strip去掉前後的空白
-    if (is_string_dtype(df['open'])):
-        df['open'] = df['open'].str.strip()
-    if (is_string_dtype(df['high'])):
-        df['high'] = df['high'].str.strip()
-    if (is_string_dtype(df['low'])):
-        df['low'] = df['low'].str.strip()
-    if (is_string_dtype(df['over'])):
-        df['over'] = df['over'].str.strip()
-    if (is_string_dtype(df['volume'])):
-        df['volume'] = df['volume'].str.strip()
-
-
-    df.loc[df['high']=="---",["open","high","low","over"]] = df.loc[df["high"]=="---","bef"]
-    
-    df = df.astype(
-                {
-                    'stockid':'int16',
-                    'stockname':'category',
-                    'over':'float32',
-                    'open':'float32',
-                    'high':"float32",
-                    'low':"float32",
-                    'bef':"float32",
-                    "volume":"int64",
-                }
-            )
-
-
-
-        # sql_df = pd.read_sql('all_stocks_shin', engine)
-    def onerow_nh(row):
-            # 把row從series變dataframe,取出的row會被當成series但他是直行,先變成list,再變成橫的dataframe
-            row_pd = pd.DataFrame([row])
-            nowstockid = row_pd.iloc[0,0]
-            nowname = row_pd.iloc[0,1]
-            nowprice = row_pd.iloc[0,2]
-            nowvolume = row_pd.iloc[0,6]
-            newhigh(nowprice,nowstockid,nowname,nowvolume,30,60,90)
-    
-    df.apply(onerow_nh,axis = 1)
+    df_stock_ids = pd.read_sql("SELECT stockid FROM all_id_name", engine)
+    print(f"Total number of stocks: {len(df_stock_ids)}")
+    df_stock_ids.apply(process_row, axis=1)
 
 
 
@@ -163,28 +98,29 @@ h_day2 = []
 h_id_day2=[]
 h_day3 = []
 h_id_day3=[]
+detect_new_highs()
 
 # ----自動執行-----------------------------------------
     
-schedule.every(5).minutes.do(detect_nh)
-schedule.every().day.at("09:00").do(detect_nh)
+# schedule.every(5).minutes.do(detect_new_highs)
+# schedule.every().day.at("09:00").do(detect_new_highs)
 
-def job_cancel():
-    global running
-    running = False
-    print("Stopped")
-    return schedule.clear()
+# def job_cancel():
+#     global running
+#     running = False
+#     print("Stopped")
+#     return schedule.clear()
 
-schedule.every().day.at('15:00').do(job_cancel)
+# schedule.every().day.at('17:00').do(job_cancel)
 
-while True:
+# while True:
 
-    schedule.run_pending()
-    if not schedule.jobs:
-        break
-    time.sleep(1)
+#     schedule.run_pending()
+#     if not schedule.jobs:
+#         break
+#     time.sleep(1)
 
-print("Today is end!!")
+# print("Today is end!!")
 
 
 
