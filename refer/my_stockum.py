@@ -144,6 +144,7 @@ while True:
     if (data[0].shape[0]) == 0:
     # quit()
         print(f"{upnewd}(星期{week_day})今天可能是假日")
+        time.sleep(5)
         
         # onedaytype = {
         # "Up_date" : DATE,
@@ -175,7 +176,15 @@ while True:
 
         data_s = data_s.fillna(0)
         data_s["up_date"] = now_day
-        data_s['volume'] = round(data_s['volume']/1000,2)
+        data_s['kwave'] = 0.0
+        data_s['rci'] = 0.0
+        data_s['updown'] = 0.0
+        data_s['kwr'] = 0.0
+        # 50天相對強度
+        data_s['pc'] = 0.0
+        data_s['rs'] = 0.0
+        data_s['nh'] = ''
+        
         data_s = data_s.astype(
                 {
                     'stockid':'int16',
@@ -186,11 +195,21 @@ while True:
                     'low':"float32",
                     'over':'float32',
                     'bef':"float32",
-                    "up_date":"datetime64[ns]"
+                    "up_date":"datetime64[ns]",
+                    "kwave" : "float32",
+                    "rci" : "float32",
+                    "updown" : "float32",
+                    "kwr" : "float32",
+                    "pc" : "float32",
+                    "rs" : "float32",
+                    "nh" : 'category'
                 }
             )
         
+        data_s.loc[data_s['over'] < data_s['open'],'kwave'] = abs(data_s['open']-data_s['over'])+abs(data_s['open']-data_s['high'])+abs(data_s['high']-data_s['low'])+abs(data_s['low']-data_s['over'])
+        data_s.loc[data_s['over'] >= data_s['open'],'kwave'] = abs(data_s['open']-data_s['over'])+abs(data_s['open']-data_s['low'])+abs(data_s['low']-data_s['high'])+abs(data_s['high']-data_s['over'])
 
+        data_s['volume'] = data_s['volume']/1000
 
         df_id_name = data_s.iloc[:,[0,1]]
         # 用兩層中掛號,從series變成dataframe
@@ -251,6 +270,13 @@ while True:
                     'bef': Float,
                     'volume': Float,
                     'up_date' : DATE,
+                    'kwave': Float,
+                    "rci" : Float,
+                    "updown" : Float,
+                    "kwr" : Float,
+                    "pc" : Float,
+                    "rs" : Float,
+                    "nh" : NVARCHAR(length=100),
                     }
 
         d_id_dtype = {
@@ -274,6 +300,12 @@ while True:
                 # print(nowvolume)
                 newhigh(nowprice,nowstockid,nowname,nowvolume,30,60,90)
                 # -------------------------------------
+                if str(row_pd.iloc[0,0]) in h_id_day1:
+                    row_pd['nh'] = '30up'
+                if str(row_pd.iloc[0,0]) in h_id_day2:
+                    row_pd['nh'] = '3060up'
+                if str(row_pd.iloc[0,0]) in h_id_day3:
+                    row_pd['nh'] = '306090up'
                 row_pd.to_sql(f'st_{row_pd.iloc[0,0]}', engine, if_exists='append', dtype=dtypedict ,index=False  )
                 print(f"新增st_{row_pd.iloc[0,0]}資料表成功,股名:{row_pd.iloc[0,1]}")
             # 可以用df.apply的方法加上axis = 1,就可以把df內每一列當成一個row去執行IntoTable函式
@@ -322,7 +354,7 @@ while True:
         x = x+1
         timegap = 0
         # 休息五秒進行下一日
-        time.sleep(2)
+        time.sleep(10)
 
 
 

@@ -215,7 +215,7 @@ while True:
     
 
     df.loc[df['volume']=="-",'volume'] = 0
-    df['volume'] = round(df['volume']/1000,2)
+    
     df['kwave'] = 0.0
     df['rci'] = 0.0
     df['updown'] = 0.0
@@ -246,7 +246,7 @@ while True:
             )
     df.loc[df['over'] < df['open'],'kwave'] = abs(df['open']-df['over'])+abs(df['open']-df['high'])+abs(df['high']-df['low'])+abs(df['low']-df['over'])
     df.loc[df['over'] >= df['open'],'kwave'] = abs(df['open']-df['over'])+abs(df['open']-df['low'])+abs(df['low']-df['high'])+abs(df['high']-df['over'])
-    
+    df['volume'] = df['volume']/1000
 # -------------------------------------------------------------------
     newup = [x for x in new_id if x not in old_stocks]
     # 如果有新股上市寄郵件通知自己

@@ -188,7 +188,7 @@ while True:
 
 
     df.loc[df['high']=="---",["open","high","low","over"]] = df.loc[df["high"]=="---","bef"]
-    df['volume'] = round((df['volume']/1000),2)
+    df['volume'] = df['volume']/1000
     df['kwave'] = 0.0
     df['rci'] = 0.0
     df['updown'] = 0.0

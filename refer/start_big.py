@@ -13,8 +13,8 @@ onedaytype = {
         "Big":Float
     }
 a_day = {
-        "Up_date" : datetime.date(2024,5,2),
-        "Big":20222.44
+        "Up_date" : datetime.date(2024,1,1),
+        "Big":17853.76
     }
 
     # 必須設index

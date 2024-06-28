@@ -13,8 +13,8 @@ onedaytype = {
         "Tpex":Float
     }
 a_day = {
-        "Up_date" : datetime.date(2024,5,2),
-        "Tpex":250.2
+        "Up_date" : datetime.date(2024,1,1),
+        "Tpex":233.23
     }
 
     # 必須設index

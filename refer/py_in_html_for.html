@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pyscript 範例</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+    <h1>資料表內容</h1>
+    <div id="table-container"></div>
+
+    <py-script>
+        import pandas as pd
+
+        # 假設我們有一個名為 'data.csv' 的 CSV 檔案
+        data = pd.read_csv('data.csv')
+
+        # 在網頁上建立一個表格
+        table_html = '<table>'
+        table_html += '<tr>'
+        for column in data.columns:
+            table_html += f'<th>{column}</th>'
+        table_html += '</tr>'
+
+        for _, row in data.iterrows():
+            table_html += '<tr>'
+            for value in row:
+                table_html += f'<td>{value}</td>'
+            table_html += '</tr>'
+
+        table_html += '</table>'
+
+        # 將表格 HTML 插入到網頁上
+        Element('table-container').write(table_html)
+    </py-script>
+</body>
+</html>

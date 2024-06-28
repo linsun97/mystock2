@@ -1,0 +1,47 @@
+<!--  # 使用PyScript
+# PyScript是Anaconda開發的一個新的開源專案,可以在HTML中直接編寫Python程式
+# 使用PyScript需要先引入相關的CSS和JS檔案
+# 在HTML中使用<py-script>標籤包裹Python程式碼
+# 可以使用pyscript.write()方法將Python計算結果輸出到指定的HTML標籤中 
+# 需要使用<py-env>標籤指定需要引入的Python套件 -->
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>PyScript Pandas Database Example</title>
+        <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+        <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    </head>
+    <body>
+        <h2>PyScript Pandas Database Example</h2>
+    
+        <py-script>
+            import pandas as pd
+            import sqlite3
+    
+            # 創建一個簡單的Pandas DataFrame
+            data = {
+                'Name': ['Alice', 'Bob', 'Charlie'],
+                'Age': [25, 30, 35],
+                'City': ['New York', 'London', 'Paris']
+            }
+            df = pd.DataFrame(data)
+    
+            # 連接到SQLite數據庫
+            conn = sqlite3.connect('example.db')
+    
+            # 將DataFrame存入數據表
+            df.to_sql('users', conn, if_exists='replace', index=False)
+    
+            # 從數據表中讀取數據並顯示
+            df_from_db = pd.read_sql_query("SELECT * FROM users", conn)
+            pyscript.write('output', df_from_db)
+    
+            # 關閉數據庫連接
+            conn.close()
+        </py-script>
+    
+        <div id="output"></div>
+    </body>
+    </html>
