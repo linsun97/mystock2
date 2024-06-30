@@ -1,0 +1,7 @@
+{% include "layout.html" %}
+{% block content %}
+ {{stockid|safe}}
+ <img src="data:image/png;base64,{{ plot_url1 }}" alt="First Plot">
+ <br>
+ <img src="data:image/png;base64,{{ plot_url2 }}" alt="Second Plot">
+{% endblock content %}

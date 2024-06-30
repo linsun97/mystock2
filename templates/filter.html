@@ -1,0 +1,65 @@
+{% include "layout.html" %}
+{% block content %}
+    <div class="container">
+        <label for="staticEmail" class="card text-white bg-primary mb-3" ></label>
+        
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group" >
+                <div class="col-sm-10">
+                    {{ form.cash_check(class="form-check-input")}}
+                    {{ form.cash_check.label(class="form-check-label")}}
+                    {{ form.cash_a.label(class="form-control-label") }}
+                    {{ form.cash_a(class="form-control-input") }}
+                </div>
+                <div class="col-sm-10">
+                    {{ form.bigguy_check(class="form-check-input")}}
+                    {{ form.bigguy_check.label(class="form-check-label")}}
+                    {{ form.bigguy_a.label(class="form-control-label") }}
+                    {{ form.bigguy_a(class="form-control-input") }}
+                </div>
+                <div class="col-sm-10">
+                    {{ form.capital_check(class="form-check-input")}}
+                    {{ form.capital_check.label(class="form-check-label")}}
+                    {{ form.capital_a.label(class="form-control-label") }}
+                    {{ form.capital_a(class="form-control-input") }}
+                </div>
+                <div class="col-sm-10">
+                    {{ form.estab_check(class="form-check-input")}}
+                    {{ form.estab_check.label(class="form-check-label")}}
+                    {{ form.estab_a.label(class="form-control-label") }}
+                    {{ form.estab_a(class="form-control-input") }}
+                </div>
+                <div class="col-sm-10">
+                    {{ form.up_check(class="form-check-input")}}
+                    {{ form.up_check.label(class="form-check-label")}}
+                    {{ form.up_a.label(class="form-control-label") }}
+                    {{ form.up_a(class="form-control-input") }}
+                </div>
+                <div class="col-sm-10">
+                    {{ form.netrate_check(class="form-check-input")}}
+                    {{ form.netrate_check.label(class="form-check-label")}}
+                    {{ form.netrate_a.label(class="form-control-label") }}
+                    {{ form.netrate_a(class="form-control-input") }}
+                </div>
+                <div class="col-sm-10">
+                    {{ form.price_check(class="form-check-input")}}
+                    {{ form.price_check.label(class="form-check-label")}}
+                    {{ form.price_a.label(class="form-control-label") }}
+                    {{ form.price_a(class="form-control-input") }}
+                </div>
+                <div class="col-sm-10">
+                    {{ form.amount_check(class="form-check-input")}}
+                    {{ form.amount_check.label(class="form-check-label")}}
+                    {{ form.amount_a.label(class="form-control-label") }}
+                    {{ form.amount_a(class="form-control-input") }}
+                </div>
+                
+               
+            </fieldset>
+            <div class="col-sm-10">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+{% endblock content %}

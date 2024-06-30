@@ -1,0 +1,45 @@
+{% include "layout.html" %}
+
+<head>
+   
+    <title>index</title>
+</head>
+<body>
+{% block content %}
+<div class="container" >
+    <div class="row justify-content-center" >
+    <table  class="table table-striped">
+        <tr>
+            {% for column in data.columns %}
+            <th class="table-primary">{{ column }}</th>
+            {% endfor %}
+        </tr>
+
+        {% for _, row in data.iterrows() %}
+        <tr>
+            {% for i, value in enumerate(row)  %}
+                {% if i == 0 %}
+                    <td class="table-secondary"><a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ value }}" target='_blank'>{{ value }}</a></td>
+                {% elif  i == 3 and value > 2.5  %}
+                    <td class="table-success">{{ value }}</td>
+                {% elif i == 1 and value < 10 %}
+                    <td class="table-danger">{{ value }}</td>
+                {% elif i == 2 and value > 40 %}
+                    <td class="table-info">{{ value }}</td>
+                {% else %}
+                    <td class="table-warning">{{ value }}</td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+</div>
+{% endblock content%}
+
+
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+   
+</body>
+</html>

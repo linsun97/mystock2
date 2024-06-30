@@ -1,0 +1,166 @@
+{% include "layout.html" %}
+
+<head>
+   
+    <title>index</title>
+</head>
+<body>
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center" >
+        <div class="col-5">        
+        <small>興櫃創30日新高股</small>
+        {% if results1 == None %}
+        <p>沒有資料</p>
+        {% else %}
+            <table  class="table table-striped">
+                
+                <tr>
+                <th>i</th>
+                <th>股票</th>
+                <th>股名</th>
+                <th>指標</th>
+                <th>Ratio</th>
+                </tr>
+                <!-- {{results1|safe}} -->
+                {% for _,row in enumerate(results1) %}
+                <tr><td>{{ _ }}</td><td>{{ row[0] }}</td><td>{{ row[1] }}({{ d1v[_] }})</td><td>
+                    <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ row[0] }}" target='_blank'>g</a>,
+                    <a href="{{ url_for('pic_stock', stockid= row[0] ) }} ">P</a>,
+                    {% if row[0]|string in monid %}
+                    <font color="red">m,</font>
+                    {% endif %}
+                    G,
+                    k</td>
+                    <td><font color="blue">rci</font>:
+                        {% if ra[_][0] < -70 %}
+                        <font color="red">{{ra[_][0]}}</font>
+                        {% else %}
+                        {{ra[_][0]}}
+                        {% endif %}
+                        <font color="blue">ud</font>:
+                        {% if ra[_][1] <= 30 %}
+                        <font color="red">{{ra[_][1]}}</font>
+                        {% else %}
+                        {{ra[_][1]}}
+                        {% endif %}
+                        ,<font color="blue">kwr</font>:
+                        {% if ra[_][2] < 6 %}
+                        <font color="red">{{ra[_][2]}}</font>
+                        {% else %}
+                        {{ra[_][2]}}
+                        {% endif %}
+                        ,<font color="blue">rs</font>:
+                        {% if ra[_][3] > 90 %}
+                        <font color="green">{{ra[_][3]}}</font>
+                        {% elif ra[_][3] > 60 %}
+                        <font color="red">{{ra[_][3]}}</font>
+                        {% else %}
+                        {{ra[_][3]}}
+                        {% endif %}</td>
+                </tr>
+                
+                {% endfor %}
+                    
+            </table>
+        {% endif %}
+        </div>
+        <div class="col-5">        
+            <small>上櫃創60日新高股</small>
+            {% if results4 == None %}
+            <p>沒有資料</p>
+            {% else %}
+                <table  class="table table-striped">
+                    <tr>
+                    <th>i</th>
+                    <th>股票</th>
+                    <th>股名</th>
+                    <th>指標</th>
+                    <th>Ratio</th>
+                    </tr>
+                    {% for _,row in enumerate(results4) %}
+                    <tr><td>{{ _ }}</td><td>{{ row[0] }}</td><td>{{ row[1] }}({{ supd1v[_] }})</td><td>
+                        <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ row[0] }}" target='_blank'>g</a>,
+                        <a href="{{ url_for('pic_stock', stockid= row[0] ) }} ">P</a>,
+                        {% if row[0]|string in monid %}
+                        <font color="red">m,</font>
+                        {% endif %}
+                        G,
+                        k</td>
+                        <td><font color="blue">rci</font>:
+                            {% if ra_sup[_][0] < -70 %}
+                            <font color="red">{{ra_sup[_][0]}}</font>
+                            {% else %}
+                            {{ra_sup[_][0]}}
+                            {% endif %}
+                            <font color="blue">ud</font>:
+                            {% if ra_sup[_][1] <= 30 %}
+                            <font color="red">{{ra_sup[_][1]}}</font>
+                            {% else %}
+                            {{ra_sup[_][1]}}
+                            {% endif %}
+                            ,<font color="blue">kwr</font>:
+                            {% if ra_sup[_][2] < 6 %}
+                            <font color="red">{{ra_sup[_][2]}}</font>
+                            {% else %}
+                            {{ra_sup[_][2]}}
+                            {% endif %}
+                            ,<font color="blue">rs</font>:
+                            {% if ra_sup[_][3] > 90 %}
+                            <font color="green">{{ra_sup[_][3]}}</font>
+                            {% elif ra_sup[_][3] > 60 %}
+                            <font color="red">{{ra_sup[_][3]}}</font>
+                            {% else %}
+                            {{ra_sup[_][3]}}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    
+                    {% endfor %}
+                        
+                </table>
+            {% endif %}
+        </div>
+        <div class="col-2">
+            <small>創新版創30日新高股</small>
+        {% if results1 == None %}
+        <p>沒有資料</p>
+        {% else %}
+            <table  class="table table-striped">
+                <tr>
+                <th>i</th>
+                <th>股票</th>
+                <th>股名</th>
+                <th>指標</th>
+                <th>R</th>
+               
+                </tr>
+                {% for _,row in enumerate(results7) %}
+                <tr><td>{{ _ }}</td><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>
+                    <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ row[0] }}" target='_blank'>g</a>,
+                    <a href="{{ url_for('pic_stock', stockid= row[0] ) }} ">P</a>,
+                    {% if row[0]|string in monid %}
+                    <font color="red">m</font>,
+                    {% endif %}
+                    G,
+                    k</td>
+                    <td><font color="blue">r</font></td>
+                    
+                </tr>
+                
+                {% endfor %}
+                    
+            </table>
+        {% endif %}
+        </div>
+        
+    </div>
+</div>
+{% endblock content%}
+
+
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
+</body>
+</html>

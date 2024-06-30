@@ -1,0 +1,57 @@
+<!-- {% include "layout.html" %} -->
+ {% extends "layout.html" %}
+
+<head>
+   
+    <title>符合過濾器的股票</title>
+</head>
+<body>
+{% block content %}
+<table border="1" class="container">
+    <tr>
+        <td>股票代碼</td>
+        <td>股票名稱</td>
+        <td>市場</td>
+        <td>成交價</td>
+        <td>面值</td>
+        <td>股本</td>
+        <td>發行量</td>
+        <td>成立年數</td>
+        <td>掛牌年數</td>
+        <td>毛利率</td>
+        <td>淨利率</td>
+        <td>類別</td>
+        <td>面額</td>
+        <td>資本額</td>
+        <td>成立日</td>
+        <td>掛牌日</td>
+        <td>Ginfo</td>
+        <td>K圖</td>
+        <td>公開</td>
+        <td>法說</td>
+        
+    </tr>
+{% for aa in show_df %}
+    <tr>
+    {% for i in range(td_num) %}
+        <td>{{ aa[i] }}</td>
+    {% endfor %}
+    <td><a href="https://goodinfo.tw/StockInfo/StockDetail.asp?STOCK_ID={{ aa[0] }}" target="_blank">Ginfo</a></td>
+    <td><a href="https://pchome.megatime.com.tw/stock/sto0/ock1/sid{{ aa[0] }}.html" target="_blank">K圖</a></td>
+    <td><a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ aa[0] }}&year=&seamon=&mtype=B&" target="_blank">書</a></td>
+    <td><a href="https://mops.twse.com.tw/mops/web/t100sb07_1" target="_blank">簡報</a></td>
+    </tr>
+    
+{% endfor %}
+</table>
+
+{% endblock content%}
+
+
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

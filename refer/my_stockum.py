@@ -21,12 +21,10 @@ engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3
 
 # -----偵測創新高的函數--------------------------------------------
 # 這樣做h_day1,h_id_day1會變成全域變數
-h_day1 = []
 h_id_day1=[]
-h_day2 = []
 h_id_day2=[]
-h_day3 = []
 h_id_day3=[]
+h_vo_day1=[]
 
 def newhigh(nprice,nstockid,nstockname,nvolume,day1,day2,day3):
     pd.set_option("display.float_format",'{:.2f}'.format)
@@ -53,21 +51,19 @@ def newhigh(nprice,nstockid,nstockname,nvolume,day1,day2,day3):
             # 取到小數點後兩位
             volume_day1 = round(nvolume/day1mean,2)
             print(f"成交量是平均值的{volume_day1}倍")
-            h_day1.append(f"{nstockid}({nstockname})")
             h_id_day1.append(f"{nstockid}")
+            h_vo_day1.append(f"{volume_day1}")
             # print("now high stocks:")
             # print(h_id_day1)
 
         # newh_day2 = []
         if nprice >= day2max:
             print(f"{nstockid},{nstockname}創{day2}天新高")
-            h_day2.append(f"{nstockid}({nstockname})")
             h_id_day2.append(f"{nstockid}")
 
         # newh_day3 = []
         if nprice >= day3max:
             print(f"{nstockid},{nstockname}創{day3}天新高")
-            h_day3.append(f"{nstockid}({nstockname})")
             h_id_day3.append(f"{nstockid}")
     
     except Exception as e:
@@ -87,12 +83,10 @@ except:
 x = 1
 timegap = 0
 while True:
-    h_day1 = []
     h_id_day1=[]
-    h_day2 = []
     h_id_day2=[]
-    h_day3 = []
     h_id_day3=[]
+    h_vo_day1=[]
     old_stocks = []
     try:
         old_df = pd.read_sql('select stockid from all_id_name_sum',engine)
@@ -315,6 +309,7 @@ while True:
         newh_day1_str = ",".join(map(str, h_id_day1))
         newh_day2_str = ",".join(map(str, h_id_day2))
         newh_day3_str = ",".join(map(str, h_id_day3))
+        newv_day1_str = ",".join(map(str, h_vo_day1))
 
 
         # 建立新df做每日報表
@@ -332,7 +327,8 @@ while True:
             "New_up" : NVARCHAR(length=1000),
             "day1_high" : NVARCHAR(length=10000),
             "day2_high" : NVARCHAR(length=10000),
-            "day3_high" : NVARCHAR(length=10000)
+            "day3_high" : NVARCHAR(length=10000),
+            "d1vo_high" : NVARCHAR(length=10000),
             }
         
         a_day = {
@@ -340,7 +336,8 @@ while True:
             "New_up" : new_stocks,
             "day1_high" : newh_day1_str,
             "day2_high" : newh_day2_str,
-            "day3_high" : newh_day3_str
+            "day3_high" : newh_day3_str,
+            "d1vo_high" : newv_day1_str
         }
 
         # 必須設index
