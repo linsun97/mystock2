@@ -42,6 +42,7 @@ def get_shin_newhigh():
                 print(f"成交量是平均值的{volume_day1}倍")
                 h_day1.append(f"{nstockid}({nstockname})")
                 h_id_day1.append(f"{nstockid}")
+                h_vol_day1.append(f"{volume_day1}")
 
             # newh_day2 = []
             if nprice >= day2max:
@@ -107,6 +108,7 @@ def get_shin_newhigh():
     
         df = pd.DataFrame(all_stocks_shin)
     # print(df)
+        # return df
     # quit()
     
         df.columns = ["stockid","stockname","over","high","low","bef","volume"]
@@ -124,6 +126,8 @@ def get_shin_newhigh():
             df['bef'] = df['bef'].str.strip()
         if (is_string_dtype(df['volume'])):
             df['volume'] = df['volume'].str.strip()
+
+        df.loc[df['bef']=="-",'bef'] = 0
             
         # 將值為"-"的內容換成bef的值或0
         df.loc[df['high']=="-",['high','low','over']] = df.loc[df['high']=="-",'bef']
@@ -133,6 +137,7 @@ def get_shin_newhigh():
         
 
         df.loc[df['volume']=="-",'volume'] = 0
+        
         # print(df)
         # print(df.info())
         # quit()
@@ -144,11 +149,13 @@ def get_shin_newhigh():
                         'high':"float32",
                         'low':"float32",
                         'bef':'float32',
-                        "volume":"int64"
+                        "volume":"float32"
                     }
                 )
+        df['volume'] = df['volume']/1000
         # print(df)
         # print(df.info())
+        # return df
         # quit()
 
 
@@ -162,6 +169,7 @@ def get_shin_newhigh():
                 newhigh(nowprice,nowstockid,nowname,nowvolume,30,60,90)
         
         df.apply(onerow_nh,axis = 1)
+        return h_day1,h_day2,h_day3,h_vol_day1
 
 
 
@@ -173,9 +181,13 @@ def get_shin_newhigh():
     h_id_day2=[]
     h_day3 = []
     h_id_day3=[]
+    h_vol_day1 = []
 
-    detect_nh()
-    return h_day1,h_day2,h_day3
+    h_day1,h_day2,h_day3,h_vol_day1 = detect_nh()
+    # df1 =detect_nh()
+    # return df1
+    
+    return h_day1,h_day2,h_day3,h_vol_day1
 
 # ----自動執行-----------------------------------------
     

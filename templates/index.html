@@ -30,8 +30,10 @@
                     {% if row[0]|string in monid %}
                     <font color="red">m,</font>
                     {% endif %}
-                    G,
-                    k</td>
+                    {% if row[0]|string in big_increase %}
+                    <font color="red">B</font>,
+                    {% endif %}
+                    </td>
                     <td><font color="blue">rci</font>:
                         {% if ra[_][0] < -70 %}
                         <font color="red">{{ra[_][0]}}</font>
@@ -85,8 +87,10 @@
                         {% if row[0]|string in monid %}
                         <font color="red">m,</font>
                         {% endif %}
-                        G,
-                        k</td>
+                        {% if row[0]|string in big_increase %}
+                        <font color="red">B</font>,
+                        {% endif %}
+                       </td>
                         <td><font color="blue">rci</font>:
                             {% if ra_sup[_][0] < -70 %}
                             <font color="red">{{ra_sup[_][0]}}</font>
@@ -142,8 +146,11 @@
                     {% if row[0]|string in monid %}
                     <font color="red">m</font>,
                     {% endif %}
-                    G,
-                    k</td>
+                    {% if row[0]|string in big_increase %}
+                    <font color="red">B</font>,
+                    {% endif %}
+                    
+                    </td>
                     <td><font color="blue">r</font></td>
                     
                 </tr>

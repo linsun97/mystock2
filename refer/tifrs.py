@@ -36,6 +36,8 @@ elif today == date(int(today_year), 11, 20):
     season = "Q3"
     sen_no = 3
     inv_l = 1.66
+else:
+    quit()
 
 # upyear = "2024"
 # season = "Q1"

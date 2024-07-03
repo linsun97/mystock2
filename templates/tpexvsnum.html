@@ -1,0 +1,13 @@
+{% include "layout.html" %}
+
+<head>
+    <title>tpexvsnum</title>
+</head> 
+<body>
+{% block content %}
+<img src="data:image/png;base64,{{ plot_url1 }}" alt="First Plot">
+            <br>
+<img src="data:image/png;base64,{{ plot_url2 }}" alt="Second Plot">
+            <br>
+{% endblock content %}
+</body>

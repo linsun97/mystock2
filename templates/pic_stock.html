@@ -1,7 +1,58 @@
 {% include "layout.html" %}
 {% block content %}
- {{stockid|safe}}
- <img src="data:image/png;base64,{{ plot_url1 }}" alt="First Plot">
- <br>
- <img src="data:image/png;base64,{{ plot_url2 }}" alt="Second Plot">
+<div class=" container">
+    <div class="row justify-content-center" >
+        <form method="GET" action="">
+            <input type="text" name="stockid" placeholder="請輸入股票代碼">
+            <input type="submit" value="送出">
+            <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{stockid|safe}} " target='_blank'>{{stockid|safe}}({{stockname|safe}})[goodinfo]</a> <a href="https://pchome.megatime.com.tw/stock/sto0/ock1/sid{{stockid|safe}}.html" target='_blank'>K線圖</a>
+        </form>
+        
+    </div>
+    <div class="row justify-content-center" >
+        <div class="col-12">
+            
+            <img src="data:image/png;base64,{{ plot_url1 }}" alt="First Plot">
+            <br>
+            <img src="data:image/png;base64,{{ plot_url2 }}" alt="Second Plot">
+            <br>
+            <img src="data:image/png;base64,{{ plot_url3 }}" alt="3 Plot">
+            <br>
+            <img src="data:image/png;base64,{{ plot_url4 }}" alt="4 Plot">
+        
+        
+        </div>
+        <div class="col-12 ">
+            <table class="table table-striped">
+                <tr class="table-info">
+                    {% for column in df1.columns %}
+                    <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+                {% for _,row in df1.iterrows() %}
+                <tr class="table-light">
+                    
+                    <td class="table-success">{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td class="table-success">{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                    <td>{{ row[6] }}</td>
+                    <td>{{ row[7] }}</td>
+                    <td>{{ row[8] }}</td>
+                    <td>{{ row[9] }}</td>
+                    <td class="table-danger">{{ row[10] }}</td>
+                    <td class="table-warning">{{ row[11] }}</td>
+                    <td class="table-danger">{{ row[12] }}</td>
+                    <td>{{ row[13] }}</td>
+                    <td class="table-warning">{{ row[14] }}</td>
+                    <td>{{ row[15] }}</td>
+                </tr>
+                
+                {% endfor %}
+
+    </div>
+</div>
+ 
 {% endblock content %}

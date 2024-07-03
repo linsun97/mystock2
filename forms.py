@@ -39,9 +39,6 @@ class filter_stocks(FlaskForm):
     submit = SubmitField('Sign Up')
 
 
-class LoginForm(FlaskForm):
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
-    submit = SubmitField('Login')
+class InputId(FlaskForm):
+    password = StringField('stockid', validators=[DataRequired()])
+    submit = SubmitField('Send')

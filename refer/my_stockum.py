@@ -351,7 +351,7 @@ while True:
         x = x+1
         timegap = 0
         # 休息五秒進行下一日
-        time.sleep(10)
+        time.sleep(2)
 
 
 

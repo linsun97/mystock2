@@ -19,7 +19,10 @@
         <tr>
             {% for i, value in enumerate(row)  %}
                 {% if i == 0 %}
-                    <td class="table-secondary"><a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ value }}" target='_blank'>{{ value }}</a></td>
+                    <td class="table-secondary">
+                        <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ value }}" target='_blank'>{{ value }}</a>
+                        <a href="{{ url_for('pic_stock', stockid= value ) }} ">,P</a>
+                    </td>
                 {% elif  i == 3 and value > 2.5  %}
                     <td class="table-success">{{ value }}</td>
                 {% elif i == 1 and value < 10 %}
