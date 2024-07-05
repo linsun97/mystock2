@@ -19,9 +19,6 @@ engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3
 pd.set_option("display.float_format",'{:.2f}'.format)
 today = datetime.today().date()
 
-# //*[@id="OVER_THE_COUNTER_STOCK"]/div/ul/li[1]/div[2]/a
-# //*[@id="OVER_THE_COUNTER_STOCK"]/div/ul/li[1]/div[2]
-
 def get_sup_newhigh():
 # -----偵測創新高的函數--------------------------------------------
     def newhigh(nprice,nstockid,nstockname,nvolume,day1,day2,day3):

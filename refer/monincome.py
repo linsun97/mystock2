@@ -82,16 +82,7 @@ def Monincome(yearlist,monlist):
 
 
 
-# ----------------------------------------
-today = datetime.today().date()
-yearnum = datetime.strftime(today, '%Y')
-monthnum = datetime.strftime(today, '%m')
-daynum = datetime.strftime(today, '%d')
-tynum = int(yearnum) - 1911
-tmnum = int(monthnum) - 1
 
-yearlist = [str(tynum)]
-monlist = [str(tmnum)]
 # monlist = ["1","2","3","4","5"]
 
 # -----將Monincome資料寫入資料庫--------------------------------------
@@ -124,6 +115,17 @@ def intomontable(all_stocks_shin,today,tynum,tmnum):
     # quit()
 # -------------------------------------------
 
+
+today = datetime.today().date()
+yearnum = datetime.strftime(today, '%Y')
+monthnum = datetime.strftime(today, '%m')
+daynum = datetime.strftime(today, '%d')
+tynum = int(yearnum) - 1911
+tmnum = int(monthnum) - 1
+
+yearlist = [str(tynum)]
+monlist = [str(tmnum)]
+# ----------------------------------------
 for mon in monlist:
     all_stocks_shin = []
     if (monthnum =="2") and (daynum == "20"):

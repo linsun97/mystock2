@@ -15,7 +15,8 @@ import matplotlib
 import plotly.graph_objects as go
 from jinja2 import Environment, FileSystemLoader
 from my_realtime_stock import get_shin_newhigh
-from my_realtime_stockup import get_sup_newhigh
+from get_stockup import get_stockup
+from get_stockum import get_stockum
 matplotlib.use('Agg')  # 強制使用 Agg 後端
 
 
@@ -115,13 +116,14 @@ def pic_stock():
         df1 = pd.read_sql_query(sql_query,engine)
         stockname = df1['stockname'].values[0]
         df = df1.iloc[::-1]
+        # df['nh_num'] = df['nh'].apply(lambda x: len(x))
+        # df['nh_num'] = df['nh'].str.len()
     except Exception as e:
         # print(e)
         return render_template('error.html',e=e)
     
     fig1, ax1 = plt.subplots()
     df.plot(kind='line', x='up_date',y='over', ax=ax1 ,figsize=(10, 2) ,color="red" )
-    # df.plot(kind='line', x='up_date',y='Big', ax=ax1 ,figsize=(10, 3) ,color="red" )
 
     df_b = pd.read_sql_query(sql_query_b,engine)
     df_b = df_b.iloc[::-1]
@@ -164,9 +166,8 @@ def pic_stock():
     fig4.savefig(img4, format='png')
     img4.seek(0)
     plot_url4 = base64.b64encode(img4.getvalue()).decode('utf8')
-    plt.close()
     
-    return render_template('pic_stock.html', stockid=stockid, stockname=stockname, plot_url1=plot_url1, plot_url2=plot_url2, plot_url3=plot_url3, plot_url4=plot_url4 , df1=df1)
+    return render_template('pic_stock.html', stockid=stockid, stockname=stockname, plot_url1=plot_url1, plot_url2=plot_url2, plot_url3=plot_url3, plot_url4=plot_url4 , df1=df1,df_b=df_b,df_t=df_t,df_r=df_r)
 
 @app.route("/tpexvsnum")
 def tpexvsnum():
@@ -176,13 +177,15 @@ def tpexvsnum():
     sql1 = "SELECT * FROM sup_oneday LEFT JOIN tpex_index ON sup_oneday.Up_date = tpex_index.Up_date order by sup_oneday.Up_date ;"
     df = pd.read_sql_query(sql1,engine)
     df['day1_num'] = df['day1_high'].apply(lambda x: len(x))
+    # df['Up_date']應該是 2024-05-01 12:12:00 這種格式
+    df['update'] = df['Up_date'].iloc[:,0]
     # 繪製折線圖
     fig1, ax1 = plt.subplots()
-    df.plot(kind='line',y='Tpex', ax=ax1 ,figsize=(10, 2) ,color="green" )
+    df.plot(kind='line',x='update',y='Tpex', ax=ax1 ,figsize=(12, 3) ,color="green" )
     # # 繪製直方圖
     
     fig2, ax2 = plt.subplots()
-    df.plot(kind='hist', y='day1_num', ax=ax2 ,figsize=(10, 2) ,color="red",bins=120)
+    df.plot(kind='bar', x='update',y='day1_num', ax=ax2 ,figsize=(12, 3) ,color="red")
     
     img1 = BytesIO()
     fig1.savefig(img1, format='png')
@@ -201,17 +204,31 @@ def shin_high():
     high1,high2,high3,hvol1 = get_shin_newhigh()
     monincome = pd.read_sql_query("select allstockid from monincome order by Up_date desc limit 1",engine)
     monid = monincome['allstockid'].values[0].split(",")
+    big_i = pd.read_sql_query("select stockid from big_increase ",engine)
+    big_increase = big_i['stockid'].values[0].split(",")
     # df = get_shin_newhigh()
-    return render_template('shin_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid)
+    return render_template('shin_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase)
     # return render_template('shin_high.html',df=df)
 
 @app.route("/sup_high")
 def sup_high():
-    high1,high2,high3,hvol1 = get_sup_newhigh()
+    high1,high2,high3,hvol1 = get_stockup()
     monincome = pd.read_sql_query("select allstockid from monincome order by Up_date desc limit 1",engine)
     monid = monincome['allstockid'].values[0].split(",")
+    big_i = pd.read_sql_query("select stockid from big_increase ",engine)
+    big_increase = big_i['stockid'].values[0].split(",")
     # df = get_shin_newhigh()
-    return render_template('sup_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid)
+    return render_template('sup_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase)
+
+@app.route("/sum_high")
+def sum_high():
+    high1,high2,high3,hvol1 = get_stockum()
+    monincome = pd.read_sql_query("select allstockid from monincome order by Up_date desc limit 1",engine)
+    monid = monincome['allstockid'].values[0].split(",")
+    big_i = pd.read_sql_query("select stockid from big_increase ",engine)
+    big_increase = big_i['stockid'].values[0].split(",")
+    # df = get_shin_newhigh()
+    return render_template('sum_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase)
 
 
 @app.route("/home")

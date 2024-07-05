@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="300">
+    <meta http-equiv="refresh" content="430">
     <title>Document</title>
 </head>
 <body>
@@ -12,7 +12,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-3 info">
-            <small>興櫃創30日新高股 <a href="https://mops.twse.com.tw/mops/web/t100sb07_1" target='_blank'>法說會</a></small>
+            <small>創新版創30日新高股</small>
             <table  class="table table-striped table-info">
                 <tr><th>股票</th><th>股名</th></tr>
                 {% for high in high1 %}
@@ -27,9 +27,9 @@
                         {% if high.replace('(',',').replace(')','').split(',')[0]|string in big_increase %}
                         <font color="red">B</font>,
                         {% endif %}
-                    </td>
+                        
 
-                    
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
@@ -50,7 +50,7 @@
 
                 
     <div class="col-4">
-        <small>興櫃創60日新高股</small>
+        <small>創新版創60日新高股</small>
         <table  class="table table-striped table-danger">
             <tr><th>股票</th><th>股名</th></tr>
             
@@ -64,9 +64,9 @@
                     <font color="red">m,</font>
                     {% endif %}
                     {% if high.replace('(',',').replace(')','').split(',')[0]|string in big_increase %}
-                    <font color="red">B</font>,
-                    {% endif %}
-                    </td>
+                        <font color="red">B</font>,
+                        {% endif %}
+                    
 
                 </td>
             </tr>
@@ -76,7 +76,7 @@
     
 
             <div class="col-4">
-                <small>興櫃創90日新高股</small>
+                <small>創新版創90日新高股</small>
                 <table  class="table table-striped table-warning">
                     <tr><th>股票</th><th>股名</th></tr>
                     {% for high in high3 %}
@@ -91,7 +91,9 @@
                             {% if high.replace('(',',').replace(')','').split(',')[0]|string in big_increase %}
                             <font color="red">B</font>,
                             {% endif %}
-                            </td>
+                            
+    
+                        </td>
                     </tr>
                     {% endfor %}
                     </table>

@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup 
 import time
 import random
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy import create_engine
 import sqlalchemy
 from sqlalchemy.types import NVARCHAR, Float, Integer,DATE,TEXT
@@ -82,4 +82,13 @@ def Get_good_big():
         raise
 
 
-Get_good_big()
+# ------------------------------------------
+today = datetime.today().date()
+daynum = datetime.strftime(today, '%d')
+# print(daynum)
+# quit()
+
+if  daynum == "01":
+    Get_good_big()
+else:
+    pass

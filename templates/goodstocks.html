@@ -22,6 +22,7 @@
                     <td class="table-secondary">
                         <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ value }}" target='_blank'>{{ value }}</a>
                         <a href="{{ url_for('pic_stock', stockid= value ) }} ">,P</a>
+                        <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ value }}&year=&seamon=&mtype=B&" target='_blank'>O</a>
                     </td>
                 {% elif  i == 3 and value > 2.5  %}
                     <td class="table-success">{{ value }}</td>
