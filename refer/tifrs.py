@@ -38,6 +38,7 @@ elif today == date(int(today_year), 11, 20):
     inv_l = 1.66
 else:
     quit()
+    # pass
 
 # upyear = "2024"
 # season = "Q1"
@@ -71,10 +72,11 @@ if response.status_code == 200:
 else:
     print(f'下載失敗：{response.status_code}')
 
-
+# quit()
 pd.set_option("display.max_columns", 500)
-file = zipfile.ZipFile(f'tifrs-{upyear}{season}.zip', 'r')
-# # print(file.namelist())
+# file = zipfile.ZipFile(f'tifrs-{upyear}{season}.zip', 'r')
+file = zipfile.ZipFile(f'tifrs-2024Q1.zip', 'r')
+# print(file.namelist())
 # quit()
 # # "https://mops.twse.com.tw/server-java/FileDownLoad?step=9&functionName=show_file2&fileName=tifrs-2024Q4.zip&filePath=/ifrs/2024/"
 
@@ -98,6 +100,7 @@ for name in file.namelist():
         # print(df)
         # quit()
         # print(df[0].shape)
+        # quit()
         df[0].columns = [chr(i) for i in range(97, 97 + len(df[0].columns))]
         # print(df[0].columns)
         # quit()
@@ -231,9 +234,8 @@ df_goodstocks =df_goodstocks.astype(
      "season": "int16"
         })
 df_goodstocks.to_sql('goodstocks', engine, if_exists='append', index=False)
-print(df_goodstocks)
+# print(df_goodstocks)
 
-import os
 
 # Specify the path to the zip file
 # Delete the zip file

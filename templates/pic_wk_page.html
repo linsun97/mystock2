@@ -1,0 +1,30 @@
+{% include "layout.html" %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=http://127.0.0.1:5000">
+    <title>pic_k_page</title>
+</head>
+{% block content %}
+<div class=" container">
+    <div class="row justify-content-center" >
+        <form method="GET" action="">
+            <input type="text" name="stockid" placeholder="請輸入股票代碼">
+            <input type="submit" value="送出">
+            <a href="https://mops.twse.com.tw/mops/web/t100sb07_1" target='_blank'>法說會</a>
+            <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ stockid }}&year=&seamon=&mtype=B&" target='_blank'>O</a>
+            <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ stockid }}&year={{ t_year }}&mtype=F&" target='_blank'>Y</a>
+
+        </form>
+        
+    </div>
+    <h1>My Plotly Chart</h1>
+    <div id="chart"></div>
+    <script>
+        Plotly.d3.d3.text("chart1.html", function(data) {
+            var traces = JSON.parse(data);
+            Plotly.newPlot('chart1', traces);
+        });
+    </script>
+</div>
+ 
+{% endblock content %}

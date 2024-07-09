@@ -101,7 +101,7 @@ def get_stockup():
             response = requests.get(url,headers=headers_i)
             response.encoding='utf-8' 
             if response.status_code == 200:
-                soup = BeautifulSoup(response.text, "html.parser") 
+                soup = BeautifulSoup(response.text, "lxml") 
                 # print(soup)
                 stockname = soup.findAll('div', {"class" : "Lh(20px)"})
                 stockid = soup.findAll('span', {"class" : "Fz(14px) C(#979ba7) Ell"})

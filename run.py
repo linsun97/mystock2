@@ -17,6 +17,9 @@ from jinja2 import Environment, FileSystemLoader
 from my_realtime_stock import get_shin_newhigh
 from get_stockup import get_stockup
 from get_stockum import get_stockum
+from datetime import datetime
+from pic_k import pic_k
+from pic_k_w import pic_k_w
 matplotlib.use('Agg')  # 強制使用 Agg 後端
 
 
@@ -24,7 +27,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config["DEBUG"] = True
 
-
+yearnum = datetime.today().strftime('%Y')
+t_year = int(yearnum) - 1911
 
 
 @app.route("/")
@@ -43,6 +47,11 @@ def index():
     # 抓出大戶比例增加的股票做成的list
     big_i = pd.read_sql_query("select stockid from big_increase ",engine)
     big_increase = big_i['stockid'].values[0].split(",")
+    # 抓出投資現金與毛利率符合標準者
+    good_s = pd.read_sql_query("select stockid from goodstocks ",engine)
+    good_stocks = good_s['stockid'].tolist()
+    # big_increase = big_i['stockid'].values[0].split(",")
+
     ra = get_allro("shin_oneday")
     ra_sup = get_allro("sup_oneday")
     try:
@@ -83,7 +92,7 @@ def index():
     except mariadb.Error as e:
         print(f"Error connecting to MariaDB Platform: {e}")
 
-    return render_template('index.html',results1=results1,d1v=d1v,ra=ra,results4=results4,supd1v=supd1v,results7=results7,ra_sup=ra_sup,monid=monid,big_increase=big_increase,enumerate=enumerate)
+    return render_template('index.html',results1=results1,d1v=d1v,ra=ra,results4=results4,supd1v=supd1v,results7=results7,ra_sup=ra_sup,monid=monid,big_increase=big_increase,t_year=t_year,good_stocks=good_stocks,enumerate=enumerate)
 
 @app.route("/goodstocks")
 def goodstocks():
@@ -167,7 +176,7 @@ def pic_stock():
     img4.seek(0)
     plot_url4 = base64.b64encode(img4.getvalue()).decode('utf8')
     
-    return render_template('pic_stock.html', stockid=stockid, stockname=stockname, plot_url1=plot_url1, plot_url2=plot_url2, plot_url3=plot_url3, plot_url4=plot_url4 , df1=df1,df_b=df_b,df_t=df_t,df_r=df_r)
+    return render_template('pic_stock.html', stockid=stockid, stockname=stockname, plot_url1=plot_url1, plot_url2=plot_url2, plot_url3=plot_url3, plot_url4=plot_url4 , df1=df1,df_b=df_b,df_t=df_t,df_r=df_r,t_year=t_year)
 
 @app.route("/tpexvsnum")
 def tpexvsnum():
@@ -206,8 +215,11 @@ def shin_high():
     monid = monincome['allstockid'].values[0].split(",")
     big_i = pd.read_sql_query("select stockid from big_increase ",engine)
     big_increase = big_i['stockid'].values[0].split(",")
+     # 抓出投資現金與毛利率符合標準者
+    good_s = pd.read_sql_query("select stockid from goodstocks ",engine)
+    good_stocks = good_s['stockid'].tolist()
     # df = get_shin_newhigh()
-    return render_template('shin_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase)
+    return render_template('shin_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase,t_year=t_year,good_stocks=good_stocks)
     # return render_template('shin_high.html',df=df)
 
 @app.route("/sup_high")
@@ -217,8 +229,11 @@ def sup_high():
     monid = monincome['allstockid'].values[0].split(",")
     big_i = pd.read_sql_query("select stockid from big_increase ",engine)
     big_increase = big_i['stockid'].values[0].split(",")
+     # 抓出投資現金與毛利率符合標準者
+    good_s = pd.read_sql_query("select stockid from goodstocks ",engine)
+    good_stocks = good_s['stockid'].tolist()
     # df = get_shin_newhigh()
-    return render_template('sup_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase)
+    return render_template('sup_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase,t_year=t_year,good_stocks=good_stocks)
 
 @app.route("/sum_high")
 def sum_high():
@@ -227,10 +242,25 @@ def sum_high():
     monid = monincome['allstockid'].values[0].split(",")
     big_i = pd.read_sql_query("select stockid from big_increase ",engine)
     big_increase = big_i['stockid'].values[0].split(",")
+     # 抓出投資現金與毛利率符合標準者
+    good_s = pd.read_sql_query("select stockid from goodstocks ",engine)
+    good_stocks = good_s['stockid'].tolist()
     # df = get_shin_newhigh()
-    return render_template('sum_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase)
+    return render_template('sum_high.html',high1=high1,high2=high2,high3=high3,hvol1=hvol1,monid=monid,big_increase=big_increase,t_year=t_year,good_stocks=good_stocks)
 
+@app.route("/pic_k_page")
+def pic_k_page():
+    stockid = request.args.get('stockid')
+    fig1 = pic_k(stockid)
+    # fig1.write_html('templates/chart.html')
+    return render_template('pic_k_page.html',stockid = stockid)
 
+@app.route("/pic_wk_page")
+def pic_wk_page():
+    stockid = request.args.get('stockid')
+    fig1 = pic_k_w(stockid)
+    # fig1.write_html('templates/chart1.html')
+    return render_template('pic_wk_page.html',stockid = stockid)
 @app.route("/home")
 def home():
     show_df , td_num  = Showfil()

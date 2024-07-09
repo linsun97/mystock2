@@ -21,11 +21,18 @@
                         <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ high.replace('(',',').replace(')','').split(',')[0] }}" target='_blank'>g</a>,
                         <a href="{{ url_for('pic_stock', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }} ">P</a>,
                         <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ high.replace('(',',').replace(')','').split(',')[0] }}&year=&seamon=&mtype=B&" target='_blank'>O</a>,
+                        <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ high.replace('(',',').replace(')','').split(',')[0] }}&year={{ t_year }}&mtype=F&" target='_blank'>Y</a>,
+                        <a href="{{ url_for('pic_k_page', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }}">K</a>,
+                        <a href="{{ url_for('pic_wk_page', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }}">W</a>,
+    
                         {% if high.replace('(',',').replace(')','').split(',')[0]|string in monid %}
                         <font color="red">m,</font>
                         {% endif %}
                         {% if high.replace('(',',').replace(')','').split(',')[0]|string in big_increase %}
                         <font color="red">B</font>,
+                        {% endif %}
+                        {% if high.replace('(',',').replace(')','').split(',')[0]|string in good_stocks %}
+                        <font color="red">C</font>,
                         {% endif %}
                     </td>
 
@@ -60,11 +67,18 @@
                     <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ high.replace('(',',').replace(')','').split(',')[0] }}" target='_blank'>g</a>,
                     <a href="{{ url_for('pic_stock', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }} ">P</a>,
                     <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ high.replace('(',',').replace(')','').split(',')[0] }}&year=&seamon=&mtype=B&" target='_blank'>O</a>,
+                    <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ high.replace('(',',').replace(')','').split(',')[0] }}&year={{ t_year }}&mtype=F&" target='_blank'>Y</a>,
+                    <a href="{{ url_for('pic_k_page', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }}">K</a>,
+                    <a href="{{ url_for('pic_wk_page', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }}">W</a>,
+
                     {% if high.replace('(',',').replace(')','').split(',')[0]|string in monid %}
                     <font color="red">m,</font>
                     {% endif %}
                     {% if high.replace('(',',').replace(')','').split(',')[0]|string in big_increase %}
                     <font color="red">B</font>,
+                    {% endif %}
+                    {% if high.replace('(',',').replace(')','').split(',')[0]|string in good_stocks %}
+                    <font color="red">C</font>,
                     {% endif %}
                     </td>
 
@@ -85,11 +99,18 @@
                             <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{ high.replace('(',',').replace(')','').split(',')[0] }}" target='_blank'>g</a>,
                             <a href="{{ url_for('pic_stock', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }} ">P</a>,
                             <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ high.replace('(',',').replace(')','').split(',')[0] }}&year=&seamon=&mtype=B&" target='_blank'>O</a>,
+                            <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ high.replace('(',',').replace(')','').split(',')[0] }}&year={{ t_year }}&mtype=F&" target='_blank'>Y</a>,
+                            <a href="{{ url_for('pic_k_page', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }}">K</a>,
+                            <a href="{{ url_for('pic_wk_page', stockid= high.replace('(',',').replace(')','').split(',')[0] ) }}">W</a>,
+            
                             {% if high.replace('(',',').replace(')','').split(',')[0]|string in monid %}
                             <font color="red">m,</font>
                             {% endif %}
                             {% if high.replace('(',',').replace(')','').split(',')[0]|string in big_increase %}
                             <font color="red">B</font>,
+                            {% endif %}
+                            {% if high.replace('(',',').replace(')','').split(',')[0]|string in good_stocks %}
+                            <font color="red">C</font>,
                             {% endif %}
                             </td>
                     </tr>

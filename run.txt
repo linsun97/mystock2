@@ -1,0 +1,12 @@
+1.my_big.py 大盤指數
+2.my_tpex.py 櫃買指數
+3.my_stock.py 興櫃1
+4.my_stock_r.py 興櫃2
+5.my_stockup.py 上櫃1
+6.my_stockup_r.py 上櫃2
+7.my_stockum.py 創新版1
+8.my_stockum_r.py 創新版2
+9.monincome.py 月營收達標
+10.basic_openget_all.py 基本資料
+11.tifrs.py 投資現金,毛利率
+12.goodinfo_filt.py 大戶持股增加
