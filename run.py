@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, flash, redirect , request
-from forms import filter_stocks, InputId 
+from forms import filter_stocks, InputId , add_watch
 from show_filt import Showfil
 from tifrs_basic import get_cashgood,engine
 import pandas as pd
@@ -50,7 +50,17 @@ def index():
     # 抓出投資現金與毛利率符合標準者
     good_s = pd.read_sql_query("select stockid from goodstocks ",engine)
     good_stocks = good_s['stockid'].tolist()
-    # big_increase = big_i['stockid'].values[0].split(",")
+    # 將good_stocks內數字轉成字串
+    good_stocks = list(map(str, good_stocks))
+    # 抓出監控股
+    def get_stocks():
+        df_moni = pd.read_sql_query("select * from moniter",engine)
+        id_list = df_moni['stockid'].tolist()
+        name_list = df_moni['stockname'].tolist()
+        return id_list,name_list
+    # # 从数据表中获取五个值
+    ids, names = get_stocks()
+    idnum = len(ids)
 
     ra = get_allro("shin_oneday")
     ra_sup = get_allro("sup_oneday")
@@ -92,7 +102,7 @@ def index():
     except mariadb.Error as e:
         print(f"Error connecting to MariaDB Platform: {e}")
 
-    return render_template('index.html',results1=results1,d1v=d1v,ra=ra,results4=results4,supd1v=supd1v,results7=results7,ra_sup=ra_sup,monid=monid,big_increase=big_increase,t_year=t_year,good_stocks=good_stocks,enumerate=enumerate)
+    return render_template('index.html',results1=results1,d1v=d1v,ra=ra,results4=results4,supd1v=supd1v,results7=results7,ra_sup=ra_sup,monid=monid,big_increase=big_increase,t_year=t_year,good_stocks=good_stocks,ids=ids,names=names,idnum=idnum,enumerate=enumerate,range=range)
 
 @app.route("/goodstocks")
 def goodstocks():
@@ -261,6 +271,53 @@ def pic_wk_page():
     fig1 = pic_k_w(stockid)
     # fig1.write_html('templates/chart1.html')
     return render_template('pic_wk_page.html',stockid = stockid)
+
+@app.route("/add_wh", methods=['GET', 'POST'])
+def add_wh():
+    def get_stocks():
+        df_moni = pd.read_sql_query("select * from moniter",engine)
+        id_list = df_moni['stockid'].tolist()
+        name_list = df_moni['stockname'].tolist()
+        return id_list,name_list
+    # # 从数据表中获取五个值
+    ids, names = get_stocks()
+    idnum = len(ids)
+
+    # if request.method == 'POST':
+    #     stockid_list =[]
+    #     stockname_list =[]
+    #     for i in range(idnum+10):
+    #         if request.args.get(f'stockid{i}') :
+    #             stockid_list.append(request.args.get(f'stockid{i}'))
+    #             stockname_list.append(request.args.get(f'stockname{i}'))
+    #     df_add = pd.DataFrame({'stockid':stockid_list,'stockname':stockname_list})
+    #     df_add.to_sql('moniter',engine,if_exists='replace',index=False)
+                
+    return render_template('add_watch.html',enumerate=enumerate,ids=ids,names=names,idnum=idnum)
+
+@app.route("/success", methods=['GET', 'POST'])
+def success():
+    def get_stocks():
+        df_moni = pd.read_sql_query("select * from moniter",engine)
+        id_list = df_moni['stockid'].tolist()
+        name_list = df_moni['stockname'].tolist()
+        return id_list,name_list
+    # # 从数据表中获取五个值
+    ids, names = get_stocks()
+    idnum = len(ids)
+
+    stockid_list =[]
+    stockname_list =[]
+    # aa = request.args.get('stockid0')
+    for i in range(idnum+10):
+        if request.args.get(f'stockid{i}') :
+            stockid_list.append(request.args.get(f'stockid{i}'))
+            stockname_list.append(request.args.get(f'stockname{i}'))
+    df_add = pd.DataFrame({'stockid':stockid_list,'stockname':stockname_list})
+    df_add.to_sql('moniter',engine,if_exists='replace',index=False)
+    flash('成功新增股票')
+    return render_template('success.html',stockid_list=stockid_list,stockname_list=stockname_list,enumerate=enumerate)
+
 @app.route("/home")
 def home():
     show_df , td_num  = Showfil()

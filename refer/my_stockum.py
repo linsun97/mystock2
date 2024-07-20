@@ -248,9 +248,9 @@ while True:
             server.close() #發送完成後關閉連線
         # print(newup)
         # 將新上興櫃的股票寫入文字檔中
-        with open("newum_stock.txt","w") as file:
-            for new_s in newup :
-                file.write(str(new_s)+"\n")
+        # with open("newum_stock.txt","w") as file:
+        #     for new_s in newup :
+        #         file.write(str(new_s)+"\n")
 
 # -------------------------------------------------------------------
 

@@ -22,7 +22,7 @@ nowmonth = today.month
 # upnowmonth = nowmonth-1
 nowyear = today.year
 # print(nowyear)
-
+# quit()
 #第一次先執行start_shin.py才能,只要執行一次就好,設定起始日
 engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3306/stock")
 try:
@@ -32,6 +32,7 @@ try:
     # print(lastyear)
     lastmonth = last_date.month
     # print(lastmonth)
+    # quit()
 except:   
     pass
 
@@ -72,7 +73,10 @@ for dateone in date_range:
     df = df.drop(["big_open","big_high","big_low"],axis=1)
     # dt = datetime.strptime(df['Up_date'][0], '%Y/%m/%d')
     # print(df)
+    # quit()
     dt = df['Up_date'].str.split("/",expand=True)
+    # print(dt)
+    # quit()
     # 先將字串格式改成int才能加1911
     dt = dt.astype("Int16")
     # print(dt.info())
@@ -80,6 +84,8 @@ for dateone in date_range:
     # print(dt)
     # 一定要用 [year, month, day] 當column名
     dt.columns = ["year","month","day"]
+    # print(dt)
+    # quit()
 
     df["Up_date"] = pd.to_datetime(
         dt[["year","month","day"]]

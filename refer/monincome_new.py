@@ -12,6 +12,7 @@ pd.set_option('display.max_rows', 500)
 
 def Monincome(yearlist,monlist):
     markte_list = ["rotc","otc","sii"]
+    df_combi = pd.DataFrame()
     # markte_list = ["rotc"]
     # year_list = ["113"]
     # mon_list = ["3"]
@@ -26,59 +27,36 @@ def Monincome(yearlist,monlist):
                     engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3306/stock")
                     url = f"https://mops.twse.com.tw/nas/t21/{market}/t21sc03_{down_y}_{down_m}.csv"
                     print(url)
-
-                    webpage = urllib.request.urlopen(url)  #開啟網頁
-                    # data = csv.reader(webpage.read().decode('utf-8').splitlines()) #讀取資料到data陣列中
-                    data = csv.reader(webpage.read().decode('utf-8', errors='ignore').splitlines() ) #讀取資料到data陣列中
-                    # print(data)
-                    # quit()
-                    next(data,None)
+                    df = pd.read_csv(url,
+                                     usecols=[1,2,3,5,9,10,12],
+                                     names=['upym','stockid','stockname','income','rate1','allincome','rate2'],
+                                     thousands=",",
+                                     na_values="",
+                                     header=1,
+                                    #  date_format='%Y/%m/%d',
+                                    #  parse_dates=['up_date'],
+                                     )
                     
-                    for i in data:
-                        # print(type(i[5]))
-                        # quit()
-                        stockid = i[2].strip()
-                        if i[5].strip() != ""  :
-                            income = round(float(i[5].strip())/100000 ,2)
-                        else:
-                            income = 0.0
+                    df['income'] = df["income"]/100000
+                    # df['lastyearmon'] = df["lastyearmon"]/100000
+                    df['allincome'] = df["allincome"]/100000
+                    # df['alllastmon'] = df["alllastmon"]/100000
+                    df_combi = pd.concat([df_combi,df],axis=0) 
+                    
 
-                        if i[8].strip() != "" :
-                            lastmon = round(float(i[8].strip()),2)
-                        else:
-                            lastmon = 0.0
-
-                        if i[9].strip() != "" :
-                            lastyea = round(float(i[9].strip()),2)
-                        else:
-                            lastyea = 0.0
-
-                        if i[10].strip() != "" :
-                            allincome = round(float(i[10].strip())/100000,2)
-                        else:
-                            allincome = 0.0
-
-                        if i[12].strip() != "" :
-                            alllastyea = round(float(i[12].strip()),2)
-                        else:
-                            alllastyea = 0.0
-
-                            # 去掉前後的空白
-                        stock_shin = [i[1].strip(),stockid,i[3].strip(),income,lastyea,allincome,alllastyea]
-                        all_stocks_shin.append(stock_shin)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         pass
 
+    return df_combi 
 
 # -----將Monincome資料寫入資料庫--------------------------------------
-def intomontable(all_stocks_shin,today,tynum,tmnum):
-    df = pd.DataFrame(all_stocks_shin)
-    # print(df.head())
-    # quit()
+def intomontable(df_all,today,tynum,tmnum):
+    df = df_all
     df.columns = ["up_date","stockid","stockname","income","lastyea","allincome","alllastyea"]
     df_select = df.query("lastyea > 30 and alllastyea > 20")
     df_slist = df_select['stockid'].to_list()
+    df_slist = list(map(str, df_slist))
     all_select = ",".join(df_slist)
     # all_list = all_select.split(",")
     # print(all_list)
@@ -115,13 +93,15 @@ yearlist = [str(tynum)]
 monlist = [str(tmnum)]
 # ----------------------------------------
 for mon in monlist:
-    all_stocks_shin = []
     if (monthnum =="2") and (daynum == "20"):
-        Monincome(yearlist,monlist)
-        intomontable(all_stocks_shin,today,tynum,tmnum)
+        df_all = Monincome(yearlist,monlist)
+        intomontable(df_all,today,tynum,tmnum)
     else:
-        if (monthnum !="2") and (daynum == "13"):    #如果是13號
-            Monincome(yearlist,monlist)
-            intomontable(all_stocks_shin,today,tynum,tmnum)
+        if (monthnum !="2") and (daynum == "16"):    #如果是13號
+            
+            df_all = Monincome(yearlist,monlist)
+            # print(df_all)
+            # quit()
+            intomontable(df_all,today,tynum,tmnum)
         
 

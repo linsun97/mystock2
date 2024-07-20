@@ -68,7 +68,8 @@ while True:
     # print(data)
     df = pd.DataFrame(data[0])
     # print(df)
-    print(df.shape[0])
+    # print(df.shape)
+    # quit()
     # 當天為假日
     if int(df.shape[0]) <= 1 :
         print(f"{now_day},星期{week_day}是可能是假日")

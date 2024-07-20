@@ -90,11 +90,12 @@ def cal_ratio(row):
 
             # 計算updown 一段時間的波動率範圍-預設為50天--------------------------------
             df_xday = df_copy.iloc[-50:]
-            max_value = df_xday['over'].max()
-            min_value = df_xday['over'].min()
-            mean_value = df_xday['over'].mean()
+            df_updown = df.tail(100).copy()
+            max_value = df_updown['over'].max()
+            min_value = df_updown['over'].min()
+            # mean_value = df_updown['over'].mean()
 
-            updown = round((max_value-min_value)/mean_value*100,2)
+            updown = round((max_value-min_value)/max_value*100,2)
             # print(updown)
             # quit()
 

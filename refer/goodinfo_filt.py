@@ -85,6 +85,7 @@ def Get_good_big():
 # ------------------------------------------
 today = datetime.today().date()
 daynum = datetime.strftime(today, '%d')
+# daynum = today.day 結果會是數字1
 # print(daynum)
 # quit()
 

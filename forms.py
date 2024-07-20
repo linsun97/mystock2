@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
+import pandas as pd 
+from sqlalchemy import create_engine
 
+engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3306/stock",pool_size=100,pool_recycle=3600, max_overflow=40,echo=False)
 
 class filter_stocks(FlaskForm):
     cash_check = BooleanField('Yes---')
@@ -42,3 +45,10 @@ class filter_stocks(FlaskForm):
 class InputId(FlaskForm):
     password = StringField('stockid', validators=[DataRequired()])
     submit = SubmitField('Send')
+
+class add_watch(FlaskForm):
+    stock_id = StringField('股票代碼:',\
+                        validators=[DataRequired(), Length(min=1, max=20)])
+    stock_name = StringField('股票名稱:', \
+                            validators=[DataRequired(), Length(min=1, max=20)])
+    submit = SubmitField('Sign Up')

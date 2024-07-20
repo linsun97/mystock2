@@ -5,7 +5,9 @@
         <form method="GET" action="">
             <input type="text" name="stockid" placeholder="請輸入股票代碼">
             <input type="submit" value="送出">
-            <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{stockid|safe}} " target='_blank'>{{stockid|safe}}({{stockname|safe}})[goodinfo]</a> <a href="https://pchome.megatime.com.tw/stock/sto0/ock1/sid{{stockid|safe}}.html" target='_blank'>K線圖</a> 
+            <a href="https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={{stockid|safe}} " target='_blank'>{{stockid|safe}}({{stockname|safe}})[goodinfo]</a> 
+            <a href="{{ url_for('pic_k_page', stockid= stockid )}}">K</a>,
+            <a href="{{ url_for('pic_wk_page', stockid= stockid ) }}">W</a>, 
             <a href="https://mops.twse.com.tw/mops/web/t100sb07_1" target='_blank'>法說會</a>
             <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ stockid }}&year=&seamon=&mtype=B&" target='_blank'>O</a>
             <a href="https://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={{ stockid }}&year={{ t_year }}&mtype=F&" target='_blank'>Y</a>

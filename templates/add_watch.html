@@ -1,0 +1,36 @@
+{% include "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% block content %}
+    <div class="container">
+        <label for="staticEmail" class="card text-white bg-primary mb-3" ></label>
+        
+        <form  action="/success">
+            {% for i,id in enumerate(ids) %} 
+                股票代碼:<input id =stockid{{i}} value={{id}} name="stockid{{i}}" type="text">
+                股票名稱:<input id =stockname{{i}} value={{names[i]}} name="stockname{{i}}" type="text">
+                
+                <br>
+            {% endfor %}
+            {% for i in range(idnum,idnum+10) %}
+            股票代碼:<input id =stockid{{i}} name="stockid{{i}}" type="text">
+            股票名稱:<input id =stockname{{i}}  name="stockname{{i}}" type="text">
+            <br>
+            {% endfor %}
+
+            <button>送出</button>
+        </form>
+
+          
+    </div>
+
+    {% endblock %}
+    
+</body>
+</html>
