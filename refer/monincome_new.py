@@ -54,7 +54,7 @@ def Monincome(yearlist,monlist):
 def intomontable(df_all,today,tynum,tmnum):
     df = df_all
     df.columns = ["up_date","stockid","stockname","income","lastyea","allincome","alllastyea"]
-    df_select = df.query("lastyea > 30 and alllastyea > 20")
+    df_select = df.query("lastyea > 30 and alllastyea > 10")
     df_slist = df_select['stockid'].to_list()
     df_slist = list(map(str, df_slist))
     all_select = ",".join(df_slist)
@@ -97,7 +97,7 @@ for mon in monlist:
         df_all = Monincome(yearlist,monlist)
         intomontable(df_all,today,tynum,tmnum)
     else:
-        if (monthnum !="2") and (daynum == "16"):    #如果是13號
+        if (monthnum !="2") and (daynum == "13"):    #如果是13號
             
             df_all = Monincome(yearlist,monlist)
             # print(df_all)

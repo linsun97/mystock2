@@ -40,7 +40,7 @@ except:
 
 # 測試用:
 # upnewd = "20240501"
-date_range = pd.date_range(start=date(lastyear,lastmonth,1),end=date(nowyear,nowmonth,1), freq="ME",inclusive="left")
+date_range = pd.date_range(start=date(lastyear,lastmonth,1),end=date(nowyear,nowmonth,1), freq="M",inclusive="left")
 # print(date_range)
 # quit()
 for dateone in date_range:

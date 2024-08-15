@@ -21,6 +21,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 import pandas as pd
 
+# 因新版本出現暫時起用
+from selenium.webdriver.chrome.service import Service
 
 
 def Get_openbasic(search_market):
@@ -48,12 +50,13 @@ def Get_openbasic(search_market):
         # # 上市 1 上櫃 2 興櫃 3
         # search_type = search_market
         # search_season = input_q + 1
-        options = webdriver.ChromeOptions()
-        options.add_experimental_option('detach',True)  #不自動關閉瀏覽器 
-        # s = Service(executable_path = "C:/Users/linsu/Documents/goodinfo_s/goodinfo_1/chromedriver.exe")
-        driver = webdriver.Chrome(options=options,service=ChromeService(ChromeDriverManager().install()))
-        # s = Service(executable_path = "C:/Program Files/Google/Chrome/Application/chrome.exe")
-        # driver = webdriver.Chrome(options=options,service=s)
+        # 因新版本出現暫時不用
+        # options = webdriver.ChromeOptions()
+        # options.add_experimental_option('detach',True)  #不自動關閉瀏覽器 
+        # driver = webdriver.Chrome(options=options,service=ChromeService(ChromeDriverManager().install()))
+
+        service = Service(executable_path="chromedriver.exe")
+        driver = webdriver.Chrome(service=service)
 
         driver.implicitly_wait(20) #只要設一個底下不用再設 會自動偵測是否須等10秒
         driver.get("https://mops.twse.com.tw/mops/web/t51sb01")
