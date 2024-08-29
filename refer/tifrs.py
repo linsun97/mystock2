@@ -74,8 +74,8 @@ else:
 
 # quit()
 pd.set_option("display.max_columns", 500)
-# file = zipfile.ZipFile(f'tifrs-{upyear}{season}.zip', 'r')
-file = zipfile.ZipFile(f'tifrs-2024Q1.zip', 'r')
+file = zipfile.ZipFile(f'tifrs-{upyear}{season}.zip', 'r')
+# file = zipfile.ZipFile(f'tifrs-2024Q1.zip', 'r')
 # print(file.namelist())
 # quit()
 # # "https://mops.twse.com.tw/server-java/FileDownLoad?step=9&functionName=show_file2&fileName=tifrs-2024Q4.zip&filePath=/ifrs/2024/"

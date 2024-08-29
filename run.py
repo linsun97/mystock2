@@ -142,17 +142,21 @@ def pic_stock():
         return render_template('error.html',e=e)
     
     fig1, ax1 = plt.subplots()
-    df.plot(kind='line', x='up_date',y='over', ax=ax1 ,figsize=(10, 2) ,color="red" )
-
+    df.plot(kind='line', x='up_date',y='over', ax=ax1 ,figsize=(10, 2) ,color="red" ,legend=True)
+    ax1.legend(loc='upper left')  # 設置圖例位置為左上角
+    
+  
     df_b = pd.read_sql_query(sql_query_b,engine)
     df_b = df_b.iloc[::-1]
     fig2, ax2 = plt.subplots()
-    df_b.plot(kind='line', x='Up_date',y='Big', ax=ax2 ,figsize=(10, 2) ,color="green" )
+    df_b.plot(kind='line', x='Up_date',y='Big', ax=ax2 ,figsize=(10, 2) ,color="green" ,legend=True)
+    ax2.legend(loc='upper left')  # 設置圖例位置為左上角
 
     df_t = pd.read_sql_query(sql_query_t,engine)
     df_t = df_t.iloc[::-1]
     fig3, ax3 = plt.subplots()
-    df_t.plot(kind='line', x='Up_date',y='Tpex', ax=ax3 ,figsize=(10, 2) ,color="blue")
+    df_t.plot(kind='line', x='Up_date',y='Tpex', ax=ax3 ,figsize=(10, 2) ,color="blue",legend=True)
+    ax3.legend(loc='upper left')  # 設置圖例位置為左上角
 
     sql_query_r = f"""
     SELECT * from st_{stockid}
@@ -166,7 +170,8 @@ def pic_stock():
     x = df_r['r'].values[0]
     df_r['r_r'] = df_r['r']/x
     fig4, ax4 = plt.subplots()
-    df_r.plot(kind='line', x='Up_date',y='r_r', ax=ax4 ,figsize=(10, 2) ,color="blue" ,ylabel="Tpex/over--ration" )
+    df_r.plot(kind='line', x='Up_date',y='r_r', ax=ax4 ,figsize=(10, 2) ,color="blue" ,ylabel="Tpex/over--ration" ,legend=True )
+    ax4.legend(loc='upper left')  # 設置圖例位置為左上角
 
     # 將圖表保存為圖片文件
     img1 = BytesIO()
