@@ -7,6 +7,8 @@ import email.message
 import time
 from pandas.api.types import is_string_dtype
 from pandas.api.types import is_numeric_dtype
+import http
+import requests
 # 只抓上市的創新版
 # https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date=20240603&response=html
 
@@ -110,29 +112,45 @@ while True:
     if now_day > today :
         quit()
 
-    url = f"https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date={upnewd}&response=html"
+    # url = f"https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date={upnewd}&response=html"
+    url = f"https://wwwc.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date={upnewd}&response=html"
     print(url)
-    
-    data = pd.read_html(url,
-                na_values ="--",
-                # 不用原本的"--",換成"NaN"
-                keep_default_na = False ,
-                header=2,
-                # skipfooter=6,
-                # usecols=[1,2,6,9,10,11,12],
-                # names=['stockid','stockname','bef','high','low','over','volume'],
-                thousands=",",
-                encoding="utf-8",
-                #  parse_dates=["dateone"], #需用中掛號包住
-                #  date_format="%Y%m%d",
-                #  true_values=["yes"], #需用中掛號包住
-                #  false_values=["no"], #需用中掛號包住
-                # engine='python'
-                
-                )
-    
-    # print(len(data[0]))
-    # print(data[0].shape[0])
+
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+    'Accept-Language': 'zh-TW,zh;q=0.9',
+    'Connection': 'close',
+    'Referer': 'https://www.twse.com.tw/'
+    }
+
+
+    response = requests.get(url, headers=headers)
+    # print(response)
+    # quit()
+    if response.status_code == 200:
+        data = pd.read_html(url,
+                    na_values ="--",
+                    # 不用原本的"--",換成"NaN"
+                    keep_default_na = False ,
+                    header=2,
+                    # skipfooter=6,
+                    # usecols=[1,2,6,9,10,11,12],
+                    # names=['stockid','stockname','bef','high','low','over','volume'],
+                    thousands=",",
+                    encoding="utf-8",
+                    #  parse_dates=["dateone"], #需用中掛號包住
+                    #  date_format="%Y%m%d",
+                    #  true_values=["yes"], #需用中掛號包住
+                    #  false_values=["no"], #需用中掛號包住
+                    # engine='python'
+                    
+                    )
+        print(data)
+    else:
+        print(f"Error: {response.status_code}")
+
+    print(len(data[0]))
+    print(data[0].shape[0])
     # quit()
     # data[0]==0表示0筆資料,代表當天為假日
     if (data[0].shape[0]) == 0:
@@ -351,7 +369,7 @@ while True:
         x = x+1
         timegap = 0
         # 休息五秒進行下一日
-        time.sleep(2)
+        time.sleep(30)
 
 
 

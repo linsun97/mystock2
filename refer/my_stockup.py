@@ -112,16 +112,25 @@ while True:
     tynum = int(yearnum) - 1911
     upnewd = datetime.strftime(now_day, str(tynum)+'/%m/%d')
 
-    url = f"https://www.tpex.org.tw/web/stock/aftertrading/daily_close_quotes/stk_quote_result.php?l=zh-tw&o=csv&d={upnewd}&s=0,asc" #上櫃公司-政府公開資料
+    # url = f"https://www.tpex.org.tw/web/stock/aftertrading/daily_close_quotes/stk_quote_result.php?l=zh-tw&o=csv&d={upnewd}&s=0,asc" #上櫃公司-政府公開資料
+    url = f"https://www.tpex.org.tw/www/zh-tw/afterTrading/otc?date={upnewd}&type=AL&id=&response=csv&order=0&sort=asc" #上櫃公司-政府公開資料
+    # 網址已改
     print(url)
     try:
         timegap = 0
-        data = pd.read_csv(url,usecols=[0,1,2,4,5,6,7,8],thousands=',', encoding='cp950',
-                    names=['stockid','stockname','over','open','high','low','bef','volume'],
+        data = pd.read_csv(url,usecols=[0,1,2,4,5,6,7,10],thousands=',', encoding='cp950',
+                    names=['stockid','stockname','over','open','high','low','volume','bef'],
                     #   index_col='stockid',
-                    na_values=["-", " "],skipfooter=8,header=2,
+                    na_values=["-", " "],skipfooter=8,header=3,
                     engine="python")
-        # print(data)
+        # print(data.shape[0])
+        if data.shape[0] == 0:
+            print(f"{upnewd}(星期{week_day})今天可能是假日")
+            timegap = 1
+            time.sleep(5)
+            continue
+       
+
     except:
         print(f"{upnewd}(星期{week_day})今天可能是假日")
         # onedaytype = {
@@ -182,7 +191,7 @@ while True:
         df['volume'] = df['volume'].str.strip()
 
 
-    df.loc[df['high']=="---",["open","high","low","over"]] = df.loc[df["high"]=="---","bef"]
+    df.loc[df['high']=="----",["open","high","low","over"]] = df.loc[df["high"]=="----","bef"]
     df['volume'] = df['volume']/1000
     df['kwave'] = 0.0
     df['rci'] = 0.0

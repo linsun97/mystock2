@@ -105,8 +105,13 @@ while True:
     if now_day > today :
         quit()
 
-    url = f"https://www.tpex.org.tw/web/emergingstock/historical/daily/EMDaily_dl.php?l=zh-tw&f=EMdes010.{upnewd}-C.csv"
+    # url = f"https://www.tpex.org.tw/web/emergingstock/historical/daily/EMDaily_dl.php?l=zh-tw&f=EMdes010.{upnewd}-C.csv"
+    url = f"https://www.tpex.org.tw/www/zh-tw/emerging/dailyDl?name=EMdes010.{upnewd}-C.csv"
+    # 網址已改
+    
     print(url)
+
+    
     
     try:
         timegap = 0

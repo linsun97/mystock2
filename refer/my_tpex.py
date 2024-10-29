@@ -25,6 +25,7 @@ engine = create_engine("mariadb+mariadbconnector://root:nineseve9173@127.0.0.1:3
 try:
     last_date = pd.read_sql("SELECT Up_date FROM tpex_index ORDER BY Up_date DESC LIMIT 1",engine)
     last_date = last_date.iloc[0,0]
+    # print(last_date)
 except:   
     pass
 
@@ -38,7 +39,9 @@ while True:
     uptyear = int(upyear)-1911
     upmonth = datetime.strftime(now_day, '%m')
     upday = datetime.strftime(now_day, '%d')
-    upnewd = str(uptyear)+"/"+upmonth+"/"+upday
+    # upnewd = str(uptyear)+"/"+upmonth+"/"+upday
+    upnewd = str(upyear)+"/"+upmonth+"/"+upday
+    # 格式已改為 2024/10/28 以前是 113/10/28
     # print(upnewd)
 
     if now_day > today :
@@ -46,7 +49,8 @@ while True:
     # 測試用:
     # upnewd = "113/05/03"
 
-    url = f"https://www.tpex.org.tw/web/stock/aftertrading/index_summary/summary_result.php?l=zh-tw&d={upnewd}&s=0,asc,0&o=htm"
+    # url = f"https://www.tpex.org.tw/web/stock/aftertrading/index_summary/summary_result.php?l=zh-tw&d={upnewd}&s=0,asc,0&o=htm"
+    url = f"https://www.tpex.org.tw/www/zh-tw/afterTrading/indexSummary?date={upnewd}&id=&response=html"
     print(url)
     data = pd.read_html(url,
                     na_values ="--",

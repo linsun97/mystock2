@@ -76,7 +76,7 @@ def Get_good_big():
                     if is_number(id) :
                         stockid_list.append(id)
         
-        # print(stockid_list)
+        print(stockid_list)
         big_increase = ",".join(map(str, stockid_list))
         big = {
             "stockid" : big_increase,
