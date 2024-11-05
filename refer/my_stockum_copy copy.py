@@ -9,7 +9,6 @@ from pandas.api.types import is_string_dtype
 from pandas.api.types import is_numeric_dtype
 import http
 import requests
-import os
 # 只抓上市的創新版
 # https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date=20240603&response=html
 
@@ -114,63 +113,48 @@ while True:
         quit()
 
     # url = f"https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date={upnewd}&response=html"
-    # url = f"https://wwwc.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date={upnewd}&response=html"
+    url = f"https://wwwc.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date={upnewd}&response=html"
     # url = f"https://wwwc.twse.com.tw/rwd/zh/afterTrading/STOCK_TIB?date=20241101&response=csv"
-    # print(url)
+    print(url)
 
-    # headers = {
-    # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-    # 'Accept-Language': 'zh-TW,zh;q=0.9',
-    # 'Connection': 'close',
-    # 'Referer': 'https://www.twse.com.tw/'
-    # }
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+    'Accept-Language': 'zh-TW,zh;q=0.9',
+    'Connection': 'close',
+    'Referer': 'https://www.twse.com.tw/'
+    }
 
 
-    # response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers)
     # print(response)
     # quit()
-    # if response.status_code == 200:
-    print(f"stock_data/{upnewd}.csv")
-    data = pd.read_csv(f"stock_data/{upnewd}.csv",
-                na_values ="--",
-                # 不用原本的"--",換成"NaN"
-                keep_default_na = False ,
-                header=2,
-                # skipfooter=6,
-                usecols=[0,1,2,5,6,7,8,11],
-                # names=['stockid','stockname','bef','high','low','over','volume'],
-                thousands=",",
-                encoding="cp950",
-                skipfooter=5,
-                #  parse_dates=["dateone"], #需用中掛號包住
-                #  date_format="%Y%m%d",
-                #  true_values=["yes"], #需用中掛號包住
-                #  false_values=["no"], #需用中掛號包住
-                engine='python'
-                
-                )
-    # print(data)
-    
-
-    # 設定檔案路徑
-    file_path = f"stock_data/{upnewd}.csv"
-
-    # 檢查檔案是否存在
-    if os.path.exists(file_path):
-        # 刪除檔案
-        os.remove(file_path)
-        print("檔案已成功刪除")
+    if response.status_code == 200:
+        data = pd.read_html(url,
+                    na_values ="--",
+                    # 不用原本的"--",換成"NaN"
+                    keep_default_na = False ,
+                    header=2,
+                    # skipfooter=6,
+                    # usecols=[1,2,6,9,10,11,12],
+                    # names=['stockid','stockname','bef','high','low','over','volume'],
+                    thousands=",",
+                    encoding="utf-8",
+                    #  parse_dates=["dateone"], #需用中掛號包住
+                    #  date_format="%Y%m%d",
+                    #  true_values=["yes"], #需用中掛號包住
+                    #  false_values=["no"], #需用中掛號包住
+                    # engine='python'
+                    
+                    )
+        print(data)
     else:
-        print("檔案不存在，無法刪除")
+        print(f"Error: {response.status_code}")
 
-    # else:
-    #     print(f"Error: {response.status_code}")
-
-    # print(len(data))
-    # print(data.shape[0])
+    print(len(data[0]))
+    print(data[0].shape[0])
     # quit()
     # data[0]==0表示0筆資料,代表當天為假日
-    if (data.shape[0]) == 0:
+    if (data[0].shape[0]) == 0:
     # quit()
         print(f"{upnewd}(星期{week_day})今天可能是假日")
         time.sleep(5)
@@ -196,8 +180,8 @@ while True:
     
     else:
         # quit()
-        data_s = data
-        # data_s = data_s.iloc[:-1,[0,1,2,5,6,7,8,11]]
+        data_s = pd.DataFrame(data[0])
+        data_s = data_s.iloc[:-1,[0,1,2,5,6,7,8,11]]
         # data_s = data_s.rename(columns=["stockid","stockname","volume","open","high","low","over","bef"])
         data_s.columns = ["stockid","stockname","volume","open","high","low","over","bef"]
         # 重新排列columns順序
@@ -213,9 +197,6 @@ while True:
         data_s['pc'] = 0.0
         data_s['rs'] = 0.0
         data_s['nh'] = ''
-
-        print(data_s)
-        # quit()
         
         data_s = data_s.astype(
                 {
@@ -389,7 +370,7 @@ while True:
         x = x+1
         timegap = 0
         # 休息五秒進行下一日
-        time.sleep(1)
+        time.sleep(30)
 
 
 

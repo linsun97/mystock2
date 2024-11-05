@@ -1,0 +1,10 @@
+103.178.230.197:3128
+103.239.67.30:3128
+103.228.36.193:8888
+217.61.106.155:3128
+185.20.198.250:8080
+78.47.219.204:3128
+185.229.111.106:45020
+
+
+http://list.didsoft.com/get?email=linsun97@gmail.com&pass=ikk3uv&pid=http1000&showcountry=no&excludedcountry=CN|RU&level=1|2&https=yes
