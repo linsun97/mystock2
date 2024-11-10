@@ -1,0 +1,112 @@
+要使用第三方搜尋套件來完成這項需求，DuckDuckGo API 是個不錯的選擇。雖然 DuckDuckGo 本身並沒有官方的 Python 搜尋套件，但可以使用 `duckduckgo-search` 這個第三方套件來完成搜尋。這個套件允許我們直接取得網頁搜尋結果，因此可以取代 `BeautifulSoup` 和 `Selenium`。以下是符合需求的完整程式碼：
+
+### 安裝套件
+在開始前，需要先安裝 `duckduckgo-search` 和 `fpdf2`：
+
+```bash
+pip install duckduckgo-search fpdf2
+```
+
+### 完整的程式碼
+
+```python
+import os
+from datetime import datetime
+from duckduckgo_search import ddg  # DuckDuckGo 搜尋套件
+from fpdf import FPDF  # 用於生成 PDF
+
+# 股票代碼清單
+stock_list = [7769, 6988, 3616, 7760]
+
+# 定義查詢新聞的功能
+def fetch_news(stock_id):
+    query = f"{stock_id} 台灣 股票 新聞"
+    news_data = []
+    
+    # 使用 DuckDuckGo 搜尋新聞相關資訊
+    results = ddg(query, max_results=5)  # 搜尋5個結果
+    for result in results:
+        news_data.append({
+            "title": result["title"],
+            "date": datetime.now().strftime("%Y-%m-%d"),  # 假設無日期
+            "summary": result["body"],
+            "link": result["href"]
+        })
+    return news_data
+
+# 定義查詢影片的功能
+def fetch_videos(stock_id):
+    query = f"{stock_id} 台灣 股票 影片"
+    video_data = []
+    
+    # 使用 DuckDuckGo 搜尋影片相關資訊
+    results = ddg(query, max_results=5)  # 搜尋5個結果
+    for result in results:
+        video_data.append({
+            "title": result["title"],
+            "date": datetime.now().strftime("%Y-%m-%d"),  # 假設無日期
+            "link": result["href"]
+        })
+    return video_data
+
+# 統整每支股票的報告內容
+def compile_report(stock_id):
+    news = fetch_news(stock_id)
+    videos = fetch_videos(stock_id)
+    goodinfo_link = f"https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={stock_id}&INIT=T"
+    
+    report_content = f"股票代碼: {stock_id}\nGoodinfo連結: {goodinfo_link}\n\n"
+    report_content += "新聞分析:\n"
+    for n in news:
+        report_content += f"- {n['date']}: {n['title']}\n  {n['summary']}\n  來源: {n['link']}\n\n"
+    
+    report_content += "影片分析:\n"
+    for v in videos:
+        report_content += f"- {v['date']}: {v['title']}\n  來源: {v['link']}\n\n"
+    
+    return report_content[:1000]  # 限制字數在1000以內
+
+# 生成 PDF 報告
+def generate_pdf(reports):
+    os.makedirs("report_new", exist_ok=True)
+    pdf_name = datetime.now().strftime("%Y%m%d") + "_new.pdf"
+    pdf_path = os.path.join("report_new", pdf_name)
+    
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    for report in reports:
+        pdf.multi_cell(0, 10, report)
+        pdf.add_page()  # 每檔股票分頁顯示
+
+    pdf.output(pdf_path)
+    print(f"報告已生成: {pdf_path}")
+
+# 主程式執行
+if __name__ == "__main__":
+    reports = []
+    for stock_id in stock_list:
+        report_content = compile_report(stock_id)
+        reports.append(report_content)
+    
+    generate_pdf(reports)
+```
+
+### 程式碼說明
+
+1. `fetch_news` 和 `fetch_videos`：
+   - 使用 `ddg` 函數進行 DuckDuckGo 搜尋，查詢股票代碼相關的新聞和影片。
+   - 取得的資料包括標題、摘要（若有）、連結。若無法直接取得日期，則使用當前日期。
+   
+2. `compile_report`：
+   - 根據搜尋結果生成報告內容，並在報告中加入 Goodinfo 的連結。
+   - 控制每檔股票報告內容的字數不超過 1000 字。
+
+3. `generate_pdf`：
+   - 使用 `FPDF` 將報告內容寫入 PDF 檔案，並儲存於 `report_new` 資料夾中，檔名以當天日期命名。
+
+### 注意事項
+- `duckduckgo-search` 是非官方的套件，使用此套件進行搜尋時可能有一定的限制。
+- 若要顯示繁體中文，需要設置 `FPDF` 字體支援中文。

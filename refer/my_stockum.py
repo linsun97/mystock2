@@ -131,6 +131,9 @@ while True:
     # quit()
     # if response.status_code == 200:
     print(f"stock_data/{upnewd}.csv")
+
+    
+
     data = pd.read_csv(f"stock_data/{upnewd}.csv",
                 na_values ="--",
                 # 不用原本的"--",換成"NaN"
@@ -162,6 +165,7 @@ while True:
         print("檔案已成功刪除")
     else:
         print("檔案不存在，無法刪除")
+        quit()
 
     # else:
     #     print(f"Error: {response.status_code}")
