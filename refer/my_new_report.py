@@ -1,9 +1,11 @@
 import os
 import requests
 from datetime import datetime
-from docx import Document
+# from docx import Document
 from duckduckgo_search import DDGS
+from duckduckgo_search import exceptions
 import mariadb
+import time
 
 # 股票代碼清單
 # stock_ids = ['7769', '3616', '7760']  # 股票代碼，不包括 .TW 後綴
@@ -38,7 +40,7 @@ def get_stock_names(stock_ids,table):
         print(f"Error executing query: {e}")
     
     for (stockid, stockname) in cursor.fetchall():
-        stock_names[stockid] = stockname
+        stock_names[stockid] = stockname.replace("-創","")
     
     cursor.close()
     connection.close()
@@ -68,7 +70,7 @@ def get_last_new_up_values():
             #     results[table] = new_up_value.split(",")  # 分割 New_up 欄位值
                 # 分割並轉換為整數
                 # results[table] = [int(value) for value in new_up_value.split(",") if value.strip() and (value.strip().isdigit() or is_positive_integer(value))]
-                results[table] = [int(value) for value in new_up_value.split(",") if value.strip() and (value.strip().isdigit() or isinstance(value,int))]
+                results[table] = [int(value) for value in new_up_value.split(",") if value.strip() and (value.strip().isdigit() or isinstance(value,int)) ]
             else:
                 results[table] = []
         else:
@@ -81,9 +83,21 @@ def get_last_new_up_values():
 
 # 定義查詢新聞的功能
 def fetch_news(stock_id, stock_name):
-    query = f"{stock_id} {stock_name} 台股 掛牌 登錄 興櫃"
+    query = f"{stock_id} {stock_name}  掛牌 登錄 "
     print(query)
-    results = DDGS().text(query, max_results=5)
+    time.sleep(3)
+
+    retry_count = 3
+    for i in range(retry_count):
+        try:
+            # 你的 DuckDuckGo 搜尋程式碼
+            results = DDGS().text(query, max_results=5)
+            break  # 如果請求成功則跳出迴圈
+        except exceptions.RatelimitException as e:
+            print("速率限制錯誤，嘗試重試...")
+            time.sleep(5)  # 暫停 5 秒後再重試
+
+    
     news_data = []
     
     for result in results:
@@ -98,7 +112,7 @@ def fetch_news(stock_id, stock_name):
 
 # 定義查詢影片的功能
 def fetch_videos(stock_id, stock_name):
-    query = f"{stock_name}"
+    query = f"{stock_id} {stock_name}"
     print(query)
     url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={query}&key={youtube_api_key}&maxResults=5&regionCode=TW&type=video"
     response = requests.get(url)
@@ -122,6 +136,7 @@ def compile_report(stock_id, stock_name):
     goodinfo_link = f"https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={stock_id}&INIT=T"
     
     report_content = f"## 股票代碼: {stock_id} ({stock_name})\n"
+    print(report_content)
     report_content += f"### Goodinfo連結:\n"
     report_content += f'<a href="{goodinfo_link}" target="_blank">{goodinfo_link}</a><br>\n\n'
     

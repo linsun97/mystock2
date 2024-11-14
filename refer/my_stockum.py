@@ -133,26 +133,29 @@ while True:
     print(f"stock_data/{upnewd}.csv")
 
     
-
-    data = pd.read_csv(f"stock_data/{upnewd}.csv",
-                na_values ="--",
-                # 不用原本的"--",換成"NaN"
-                keep_default_na = False ,
-                header=2,
-                # skipfooter=6,
-                usecols=[0,1,2,5,6,7,8,11],
-                # names=['stockid','stockname','bef','high','low','over','volume'],
-                thousands=",",
-                encoding="cp950",
-                skipfooter=5,
-                #  parse_dates=["dateone"], #需用中掛號包住
-                #  date_format="%Y%m%d",
-                #  true_values=["yes"], #需用中掛號包住
-                #  false_values=["no"], #需用中掛號包住
-                engine='python'
-                
-                )
-    # print(data)
+    try:
+        data = pd.read_csv(f"stock_data/{upnewd}.csv",
+                    na_values ="--",
+                    # 不用原本的"--",換成"NaN"
+                    keep_default_na = False ,
+                    header=2,
+                    # skipfooter=6,
+                    usecols=[0,1,2,5,6,7,8,11],
+                    # names=['stockid','stockname','bef','high','low','over','volume'],
+                    thousands=",",
+                    encoding="cp950",
+                    skipfooter=5,
+                    #  parse_dates=["dateone"], #需用中掛號包住
+                    #  date_format="%Y%m%d",
+                    #  true_values=["yes"], #需用中掛號包住
+                    #  false_values=["no"], #需用中掛號包住
+                    engine='python'
+                    
+                    )
+        # print(data)
+    except Exception as e:
+        print(e)
+        
     
 
     # 設定檔案路徑
@@ -165,7 +168,9 @@ while True:
         print("檔案已成功刪除")
     else:
         print("檔案不存在，無法刪除")
-        quit()
+        data = pd.DataFrame()
+        # quit()
+        
 
     # else:
     #     print(f"Error: {response.status_code}")
