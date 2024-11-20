@@ -7,6 +7,8 @@ from duckduckgo_search import exceptions
 import mariadb
 import time
 
+googlesearch_api_key = "AIzaSyC60xTfn-SWNSbc17pTzvWs-cfVGsqVZNU"
+googlesearch_engine_id = "500990df209ce4c36"
 # 股票代碼清單
 # stock_ids = ['7769', '3616', '7760']  # 股票代碼，不包括 .TW 後綴
 youtube_api_key = 'AIzaSyDirDw_Tw2lSp3rano1SLuXBqLgoR2J-zo'  # 替換為您的 YouTube Data API 金鑰
@@ -85,27 +87,61 @@ def get_last_new_up_values():
 def fetch_news(stock_id, stock_name):
     query = f"{stock_id} {stock_name}  掛牌 登錄 "
     print(query)
-    time.sleep(3)
+    # time.sleep(3)
 
-    retry_count = 3
-    for i in range(retry_count):
-        try:
-            # 你的 DuckDuckGo 搜尋程式碼
-            results = DDGS().text(query, max_results=5)
-            break  # 如果請求成功則跳出迴圈
-        except exceptions.RatelimitException as e:
-            print("速率限制錯誤，嘗試重試...")
-            time.sleep(5)  # 暫停 5 秒後再重試
+    results = None
+    # retry_count = 5
+    # for i in range(retry_count):
+    #     try:
+    #         # 你的 DuckDuckGo 搜尋程式碼
+    #         results = DDGS().text(query, max_results=5)
+    #         break  # 如果請求成功則跳出迴圈
+    #     except exceptions.RatelimitException as e:
+    #         print("速率限制錯誤，嘗試重試...")
+    #         time.sleep(5)  # 暫停 10 秒後再重試
+    
+    
+    if results == None or results == []:
+
+        # 建立 API 請求網址
+        url = f"https://www.googleapis.com/customsearch/v1?q={query}&cx={googlesearch_engine_id}&key={googlesearch_api_key}"
+
+        # 發送請求
+        response = requests.get(url)
+
+        # 處理結果
+        if response.status_code == 200:
+            results = response.json()
+            for item in results.get("items", []):
+                print(f"標題: {item['title']}")
+                print(f"連結: {item['link']}")
+                print(f"摘要: {item['snippet']}")
+                print("="*50)
+            # print(results)
+            # print(type(results))
+            # quit()
+
+            # return results
+        else:
+            print(f"請求google搜尋失敗，狀態碼: {response.status_code}")
+    
 
     
     news_data = []
     
-    for result in results:
+    # for result in results:
+    #     news_data.append({
+    #         "title": result["title"],
+    #         "date": result.get("date", "未知"),
+    #         "summary": result["body"],
+    #         "link": result["href"]
+    #     })
+    for item in results.get("items", []):
         news_data.append({
-            "title": result["title"],
-            "date": result.get("date", "未知"),
-            "summary": result["body"],
-            "link": result["href"]
+            "title": item["title"],
+            "date": item.get("date", "未知"),
+            "summary": item["snippet"],
+            "link": item["link"]
         })
     
     return news_data
@@ -126,6 +162,8 @@ def fetch_videos(stock_id, stock_name):
                 "date": item["snippet"]["publishedAt"],
                 "link": f"https://www.youtube.com/watch?v={item['id']['videoId']}"
             })
+    else:
+        print(f"Failed to fetch videos for {stock_id} {stock_name}. Status code: {response.status_code}")
     return video_data
 
 # 統整每支股票的報告內容
@@ -145,6 +183,8 @@ def compile_report(stock_id, stock_name):
     if news:
         for n in news:
             report_content += f"- **{n['date']}**: {n['title']}<br>  {n['summary']}<br>  <a href='{n['link']}' target='_blank'>來源</a><br><br>\n"
+            # time.sleep(3)  # 暫停 3 秒，避免過快請求
+
     else:
         report_content += "- 無相關新聞資料\n\n"
 
@@ -153,10 +193,13 @@ def compile_report(stock_id, stock_name):
     if videos:
         for v in videos:
             report_content += f"- **{v['date']}**: {v['title']}<br>  <a href='{v['link']}' target='_blank'>來源</a><br><br>\n"
+            # time.sleep(3)  # 暫停 3 秒，避免過快請求
+
+
     else:
         report_content += "- 無相關影片資料\n\n"
 
-    return report_content[:3000]  # 限制字數在3000以內
+    return report_content[:8000]  # 限制字數在3000以內
 
 # 生成 HTML 報告
 def generate_html(reports,table):
