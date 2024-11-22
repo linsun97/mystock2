@@ -199,7 +199,7 @@ def compile_report(stock_id, stock_name):
     else:
         report_content += "- 無相關影片資料\n\n"
 
-    return report_content[:8000]  # 限制字數在3000以內
+    return report_content[:16000]  # 限制字數在3000以內
 
 # 生成 HTML 報告
 def generate_html(reports,table):
