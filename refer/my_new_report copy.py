@@ -6,7 +6,6 @@ from duckduckgo_search import DDGS
 from duckduckgo_search import exceptions
 import mariadb
 import time
-from summary import make_summary
 
 googlesearch_api_key = "AIzaSyC60xTfn-SWNSbc17pTzvWs-cfVGsqVZNU"
 googlesearch_engine_id = "500990df209ce4c36"
@@ -110,14 +109,12 @@ def fetch_news(stock_id, stock_name):
         # 發送請求
         response = requests.get(url)
 
-        link_list = []
         # 處理結果
         if response.status_code == 200:
             results = response.json()
             for item in results.get("items", []):
                 print(f"標題: {item['title']}")
                 print(f"連結: {item['link']}")
-                link_list.append(item['link'])
                 print(f"摘要: {item['snippet']}")
                 print("="*50)
             # print(results)
@@ -125,12 +122,6 @@ def fetch_news(stock_id, stock_name):
             # quit()
 
             # return results
-            # 將link的前三個傳給make_summary
-            try:
-                make_summary(link_list[0:3])
-            except Exception as e:
-                print(f"Error:製作摘要失敗-- {e}")
-
         else:
             print(f"請求google搜尋失敗，狀態碼: {response.status_code}")
     
