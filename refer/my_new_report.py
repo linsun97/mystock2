@@ -127,7 +127,7 @@ def fetch_news(stock_id, stock_name):
             # return results
             # 將link的前三個傳給make_summary
             try:
-                make_summary(link_list[0:3])
+                make_summary(link_list[0:4])
             except Exception as e:
                 print(f"Error:製作摘要失敗-- {e}")
 
@@ -208,7 +208,7 @@ def compile_report(stock_id, stock_name):
     else:
         report_content += "- 無相關影片資料\n\n"
 
-    return report_content[:16000]  # 限制字數在3000以內
+    return report_content[:20000]  # 限制字數在3000以內
 
 # 生成 HTML 報告
 def generate_html(reports,table):

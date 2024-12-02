@@ -56,7 +56,9 @@ def make_summary(url_list):
             paragraphs = soup.find_all("p")
             main_content = "\n".join([p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True)])
             if not main_content:
-                raise Exception(f"無法提取主要內容: {url}")
+                # raise Exception(f"無法提取主要內容: {url}")
+                print(f"無法提取主要內容: {url}") # Exception(f"無法提取主要內容: {url}")
+                main_content = ""
 
             return main_content
         
