@@ -127,7 +127,13 @@ def fetch_news(stock_id, stock_name):
             # return results
             # 將link的前三個傳給make_summary
             try:
+                print(link_list)
+                print("*"*50)
+                print(link_list[0:4])
+                print("*"*50)
+
                 make_summary(link_list[0:4])
+                print(make_summary)
             except Exception as e:
                 print(f"Error:製作摘要失敗-- {e}")
 

@@ -13,7 +13,7 @@ NOTION_TOKEN = "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"  # 替換為
 NOTION_DATABASE_ID = '14d5881a436880cc8dd3fc49c05ef4f6'
 
 # 網址列表
-url_list = [ "http://www.investor.com.tw/Mobile/content.asp?articleNo=14202411290064","https://tw.stock.yahoo.com/news/%E5%AE%8F%E7%A2%81%E6%97%97%E4%B8%8B%E5%94%AF-%E9%9D%9E%E9%9B%BB%E5%AD%90%E5%B0%8F%E9%87%91%E8%99%8E-%E5%8D%9A%E7%91%9E%E9%81%94%E6%87%89%E6%9D%90%E4%BB%8A%E7%99%BB%E8%88%88%E6%AB%83-012421400.html"]
+url_list = ['https://udn.com/news/story/7254/8396851', 'https://tw.stock.yahoo.com/news/%E4%B9%85%E6%98%8C12%E6%9C%88%E4%B8%8A%E6%AB%83%E6%8E%9B%E7%89%8C-%E9%9C%8D%E7%88%BEic%E5%B0%8E%E5%85%A5%E7%A3%81%E8%BB%B8%E9%8D%B5%E7%9B%A4%E5%85%A8%E7%90%83%E7%AC%AC-065533859.html', 'https://hk.finance.yahoo.com/quote/6720.TWO/', 'https://tw.stock.yahoo.com/news/%E6%9C%80%E9%AB%98%E6%9C%89%E6%9C%9B35%E8%90%AC%E5%85%A5%E8%A2%8B%EF%BC%81%E4%B9%85%E6%98%8C%E3%80%81%E5%90%89%E8%8C%822%E6%AA%94%E6%96%B0%E8%82%A1%E7%94%B3%E8%B3%BC%E4%BB%8A%E6%97%A5%E9%96%8B%E8%B7%91-020122478.html']
 
 # 初始化 Notion 客戶端
 notion = Client(auth=NOTION_TOKEN)
@@ -75,7 +75,7 @@ def make_summary(url_list):
             model="gemini-1.5-flash-latest", google_api_key=GEMINI_API_KEY)
 
             # 輸入一個問題
-            user_input = "請將下面的內容做成約500字的繁體中文摘要：\n" + content
+            user_input = "請將以下的內容做成約500字的繁體中文摘要，請緊扣主題，不要寫到不相干的內容：\n" + content
 
             response = llm.invoke(user_input)
 
@@ -140,7 +140,10 @@ def make_summary(url_list):
     for url in url_list:
         web_content = fetch_web_content(url)  # 獲取網頁內容
         # web_content = "股票代碼: 6972 (博瑞達應材)"
-        combined_content += web_content + "\n"
+        if web_content :
+            combined_content += web_content + "\n"
+        else:
+            print(f"網頁內容為空: {url}")
         # print(combined_content)
         # quit()
     if combined_content:
@@ -150,3 +153,7 @@ def make_summary(url_list):
         add_summary_to_notion(url, summary)  # 上傳到 Notion
 
         # print(combined_content)
+
+
+# 測試
+# make_summary(url_list)
