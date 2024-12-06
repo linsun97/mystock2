@@ -5,6 +5,7 @@ from datetime import datetime
 from duckduckgo_search import DDGS
 from duckduckgo_search import exceptions
 import mariadb
+import datetime
 import time
 from summary import make_summary
 
@@ -272,5 +273,7 @@ if __name__ == "__main__":
         for stock_id, stock_name in stock_names_dict.items():
             report_content = compile_report(stock_id, stock_name)
             reports.append(report_content)
+            time.sleep(3)  # 暫停 3 秒，避免過快請求
+
 
         generate_html(reports)  # 呼叫生成 HTML 報告的函數
