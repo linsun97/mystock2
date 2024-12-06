@@ -13,7 +13,7 @@ notion = Client(auth=NOTION_TOKEN)
 # 檢查是否為指定執行日期
 def is_valid_date():
     today = datetime.date.today()
-    valid_dates = [(4, 5), (5, 25), (8, 25), (11, 25)]  # 月日
+    valid_dates = [(4, 5), (5, 25), (8, 25), (11, 25),(12,6)]  # 月日
     return (today.month, today.day) in valid_dates
 
 # 取得 MariaDB 資料
@@ -72,6 +72,7 @@ def search_stock_info(stock_list):
                 # print(link_list[0:5])
                 # print("*"*50)
                 search_results[f"{stock_id}{stock_name}"] = link_list[0:5]
+                # search_results[f"{stock_id}{stock_name}"] = link_list
                 # print(search_results)
                 # print("+-"*50)
             except Exception as e:
@@ -152,15 +153,37 @@ def summarize_links(stock_dict):
     time.sleep(2)    
         
     return summaries
+
+# 轉換為 Markdown 格式的函式
+def urls_to_markdown(urls):
+    """
+    將網址列表轉換為 Markdown 格式的字串。
+    :param urls: list，包含網址的列表
+    :return: list，包含 Markdown 格式的字串
+    """
+    markdown_list = []
+    for url in urls:
+        # 提取網址的域名作為顯示文字
+        display_text = url.split("//")[-1].split("/")[0]  # 取域名部分
+        markdown_list.append(f"[{display_text}]({url})")  # 轉為 Markdown 格式
+    return markdown_list
 def add_summary_to_notion(summaries):
     one_summary = ""
     for stockname,summary in summaries.items():
+        # summary_string = " ".join(f'<a href="{url}">{url}</a><br>' for url in map(str, summary))
+        # summary_string = "  \n".join(map(str, summary))  # 將列表轉換為字串
+        # summary_list = urls_to_markdown(summary)  # 將列表轉換為字串
+        # summary_string = " \n".join(map(str, summary_list))  # 將列表轉換為字串
+        # one_summary = f"{stockname}\n{summary_string}\n\n"
         one_summary = f"{stockname}\n{summary}\n\n"
-   
+
+    
     # print("-"*50)
     # print(one_summary)
     # print("*"*50)
     # quit()
+
+    
         # ""將摘要新增到 Notion 頁面"""
         try:
             # 使用 Notion API 創建頁面
@@ -186,7 +209,7 @@ def add_summary_to_notion(summaries):
         except Exception as e:
             print(f"建立頁面時發生錯誤: {e}")
             return None
-
+    
 
 # 寫入 Notion 資料表
 # def write_to_notion(summaries):
@@ -225,11 +248,13 @@ if __name__ == "__main__":
         # print(stock_list)
         # quit()
         search_results = search_stock_info(stock_list)
-        # print("-"*50)
+        # print("="*50)
         # print(search_results)
         # quit()
+
         summaries = summarize_links(search_results)
         # print(summaries)
         # quit()
-        add_summary_to_notion(summaries)
+
+        add_summary_to_notion(search_results)
         print("資料已成功處理並寫入 Notion。")

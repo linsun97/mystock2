@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, flash, redirect , request
+from flask import Flask, render_template, url_for, flash, redirect , request , send_from_directory
 from forms import filter_stocks, InputId , add_watch
 from show_filt import Showfil
 from tifrs_basic import get_cashgood,engine
@@ -23,7 +23,7 @@ from pic_k_w import pic_k_w
 matplotlib.use('Agg')  # 強制使用 Agg 後端
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="refer")
 app.config['SECRET_KEY'] = 'my name is linsun'
 app.config["DEBUG"] = True
 
@@ -327,6 +327,19 @@ def success():
 def home():
     show_df , td_num  = Showfil()
     return render_template('home.html',show_df=show_df , td_num=td_num)
+
+@app.route("/newup")
+def newup():
+    return render_template('file_list_sorted.html')
+
+@app.route("/moni")
+def moni():
+    return render_template('file_list_moni.html')
+
+@app.route("/refer/report_new")
+def serve_static(filename):
+    # 提供 refer 資料夾下的檔案
+    return send_from_directory("refer", filename)
 
 @app.route("/filter", methods=['GET', 'POST'])
 def filter():

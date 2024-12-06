@@ -14,8 +14,12 @@ googlesearch_engine_id = "500990df209ce4c36"
 # stock_ids = ['7769', '3616', '7760']  # 股票代碼，不包括 .TW 後綴
 youtube_api_key = 'AIzaSyDirDw_Tw2lSp3rano1SLuXBqLgoR2J-zo'  # 替換為您的 YouTube Data API 金鑰
 
+def is_valid_date():
+    today = datetime.date.today()
+    valid_dates = [(4, 5), (5, 25), (8, 25), (11, 25)]  # 月日
+    return (today.month, today.day) in valid_dates
 # 連接到 MariaDB 資料庫
-def get_stock_names(stock_ids,table):
+def get_stock_names():
     
     connection = mariadb.connect(
         user="root",       # MariaDB 使用者名稱
@@ -27,27 +31,21 @@ def get_stock_names(stock_ids,table):
     cursor = connection.cursor()
     
     stock_names = {}
+    stock_data = []
 
-    if table == "shin_oneday":
-        table_id_name = "all_id_name_shin"
-    elif table == "sum_oneday":
-        table_id_name = "all_id_name_sum"
-    elif table == "sup_oneday":
-        table_id_name = "all_id_name"
 
     try:
-        query = f"SELECT stockid, stockname FROM {table_id_name} WHERE stockid IN (%s)" % ','.join(['%s'] * len(stock_ids))
-        print(query)
-        cursor.execute(query, stock_ids)
+        cursor = connection.cursor()
+        cursor.execute("SELECT stockid, stockname FROM moniter")
+        stock_data = cursor.fetchall()  # 取得所有資料
+        connection.close()
     except mariadb.Error as e:
         print(f"Error executing query: {e}")
     
-    for (stockid, stockname) in cursor.fetchall():
-        stock_names[stockid] = stockname.replace("-創","")
-    
-    cursor.close()
-    connection.close()
-    
+    for stockid, stockname in stock_data:
+        stock_names[stockid] = stockname 
+    # print(stock_names)
+    # quit()
     return stock_names
 # 獲取每個資料表最後一筆資料的 New_up 欄位值
 def get_last_new_up_values():
@@ -86,7 +84,7 @@ def get_last_new_up_values():
 
 # 定義查詢新聞的功能
 def fetch_news(stock_id, stock_name):
-    query = f"{stock_id} {stock_name}  掛牌 登錄 "
+    query = f"{stock_id} {stock_name}  新聞 "
     print(query)
     # time.sleep(3)
 
@@ -115,10 +113,13 @@ def fetch_news(stock_id, stock_name):
         if response.status_code == 200:
             results = response.json()
             for item in results.get("items", []):
-                print(f"標題: {item['title']}")
-                print(f"連結: {item['link']}")
-                link_list.append(item['link'])
-                print(f"摘要: {item['snippet']}")
+                if item['title'] :
+                    print(f"標題: {item['title']}")
+                if item['link'] :
+                    print(f"連結: {item['link']}")
+                    link_list.append(item['link'])
+                if item['snippet'] :
+                    print(f"摘要: {item.get('snippet', '未提供摘要')}")
                 print("="*50)
             # print(results)
             # print(type(results))
@@ -126,16 +127,16 @@ def fetch_news(stock_id, stock_name):
 
             # return results
             # 將link的前三個傳給make_summary
-            try:
-                # print(link_list)
-                # print("*"*50)
-                # print(link_list[0:4])
-                # print("*"*50)
+            # try:
+            #     # print(link_list)
+            #     # print("*"*50)
+            #     # print(link_list[0:4])
+            #     # print("*"*50)
 
-                make_summary(link_list[0:4])
-                print(make_summary)
-            except Exception as e:
-                print(f"Error:製作摘要失敗-- {e}")
+            #     make_summary(link_list[0:4])
+            #     print(make_summary)
+            # except Exception as e:
+            #     print(f"Error:製作摘要失敗-- {e}")
 
         else:
             print(f"請求google搜尋失敗，狀態碼: {response.status_code}")
@@ -155,7 +156,7 @@ def fetch_news(stock_id, stock_name):
         news_data.append({
             "title": item["title"],
             "date": item.get("date", "未知"),
-            "summary": item["snippet"],
+            "summary": item.get("snippet", "未知"),
             "link": item["link"]
         })
     
@@ -214,13 +215,13 @@ def compile_report(stock_id, stock_name):
     else:
         report_content += "- 無相關影片資料\n\n"
 
-    return report_content[:20000]  # 限制字數在3000以內
+    return report_content  # 限制字數在3000以內
 
 # 生成 HTML 報告
-def generate_html(reports,table):
-    os.makedirs("report_new", exist_ok=True)
-    html_name = datetime.now().strftime("%Y%m%d") + f"_new_{table}.html"
-    html_path = os.path.join("report_new", html_name)
+def generate_html(reports):
+    os.makedirs("report_moniter", exist_ok=True)
+    html_name = datetime.now().strftime("%Y%m%d") + f"_new.html"
+    html_path = os.path.join("report_moniter", html_name)
     
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write("<html><head><meta charset='utf-8'><title>股票報告</title></head><body>")
@@ -246,20 +247,24 @@ def generate_html(reports,table):
 # 主程式執行
 if __name__ == "__main__":
     # tables = ["shin_oneday", "sum_oneday", "sup_oneday"]
-    
-    last_new_up_values = get_last_new_up_values()
+    # stock_names_dict = get_stock_names()
+    # print(stock_names_dict)
+
+    # last_new_up_values = get_last_new_up_values()
     # print(last_new_up_values)
     # quit()
     
-    for table, values in last_new_up_values.items():
-        print(f"{table} 的最後一筆 New_up 值: {values}")
+    # for table, values in last_new_up_values.items():
+    #     print(f"{table} 的最後一筆 New_up 值: {values}")
 
-        if values == []:  # 檢查 stock_ids 是否為空
-            print(f"股票代碼列表為空，今日{table}無新上市櫃股票。")
-            # quit()
-            continue
-        
-        stock_names_dict = get_stock_names(values,table)
+    #     if values == []:  # 檢查 stock_ids 是否為空
+    #         print(f"股票代碼列表為空，今日{table}無新上市櫃股票。")
+    #         # quit()
+    #         continue
+    if not is_valid_date():
+        print("今天不是指定執行日期，程式結束。")
+    else:    
+        stock_names_dict = get_stock_names()
         # print(stock_names_dict)
         
         reports = []
@@ -267,5 +272,5 @@ if __name__ == "__main__":
         for stock_id, stock_name in stock_names_dict.items():
             report_content = compile_report(stock_id, stock_name)
             reports.append(report_content)
-    
-        generate_html(reports ,table)  # 呼叫生成 HTML 報告的函數
+
+        generate_html(reports)  # 呼叫生成 HTML 報告的函數

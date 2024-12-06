@@ -280,7 +280,8 @@ while True:
             for new_s in newup :
                 content = content + f"<a href='http://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={new_s}&year=&seamon=&mtype=B&'>{new_s}的公開說明書</a><br>" + \
                                     f"<a href='https://goodinfo.tw/tw/StockDetail.asp?STOCK_ID={new_s}'>{new_s}的goodinfo</a><br>" +\
-                                    f"<a href='https://mops.twse.com.tw/mops/web/t100sb07_1'>法說會簡報下載</a><br><br>"
+                                    f"<a href='https://mops.twse.com.tw/mops/web/t100sb07_1'>法說會簡報下載</a><br>" +\
+                                    f"<a href='https://www.notion.so/1515881a4368804d8f41d4c7bdf38638'>摘要</a><br><br>" 
             #寄送郵件主要內容
             msg.add_alternative(content,subtype="html") #HTML信件內容
             acc = "linsun97"

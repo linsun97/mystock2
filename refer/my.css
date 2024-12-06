@@ -1,0 +1,9 @@
+.table th, .table td {
+  font-size: 12px;
+  margin: 0px;
+  padding: 2px;
+}
+
+.nav-item {
+  font-size: 12px;
+}
