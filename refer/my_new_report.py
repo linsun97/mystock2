@@ -190,8 +190,10 @@ def compile_report(stock_id, stock_name):
     
     report_content = f"## 股票代碼: {stock_id} ({stock_name})\n"
     print(report_content)
-    report_content += f"### Goodinfo連結:\n"
-    report_content += f'<a href="{goodinfo_link}" target="_blank">{goodinfo_link}</a><br>\n\n'
+    report_content += f"## Goodinfo||公開說明書||法說會簡報:"
+    report_content += f'''
+    <a href="{goodinfo_link}" target="_blank">Goodinfo</a> || <a href="http://doc.twse.com.tw/server-java/t57sb01?step=1&colorchg=1&co_id={stock_id}&year=&seamon=&mtype=B&">{stock_id}的公開說明書</a> || <a href="https://mops.twse.com.tw/mops/web/t100sb07_1">法說會簡報下載</a><br>
+    '''
     
     report_content += "### 新聞分析:\n"
     
