@@ -37,7 +37,20 @@ def get_stock_names():
 
     try:
         cursor = connection.cursor()
-        cursor.execute("SELECT stockid, stockname FROM moniter")
+        sql_query = """
+        WITH LatestYearSeason AS (
+            SELECT upyear, season
+            FROM goodstocks
+            ORDER BY upyear DESC, season DESC
+            LIMIT 1
+        )
+        SELECT stockid, stock_name
+        FROM goodstocks
+        LEFT JOIN basic_open_all
+        ON goodstocks.stockid = basic_open_all.stock_id
+        WHERE (upyear, season) IN (SELECT upyear, season FROM LatestYearSeason);
+        """
+        cursor.execute(sql_query)  # 執行 SQL 查詢
         stock_data = cursor.fetchall()  # 取得所有資料
         connection.close()
     except mariadb.Error as e:
@@ -45,9 +58,12 @@ def get_stock_names():
     
     for stockid, stockname in stock_data:
         stock_names[stockid] = stockname 
+    # print(stock_data)
+    # quit()
     # print(stock_names)
     # quit()
     return stock_names
+get_stock_names()
 # 獲取每個資料表最後一筆資料的 New_up 欄位值
 def get_last_new_up_values():
     tables = ["shin_oneday", "sum_oneday", "sup_oneday"]
@@ -221,9 +237,9 @@ def compile_report(stock_id, stock_name):
 
 # 生成 HTML 報告
 def generate_html(reports):
-    os.makedirs("report_moniter", exist_ok=True)
+    os.makedirs("report_goods", exist_ok=True)
     html_name = datetime.datetime.now().strftime("%Y%m%d") + f"_new.html"
-    html_path = os.path.join("report_moniter", html_name)
+    html_path = os.path.join("report_goods", html_name)
     
     with open(html_path, 'w', encoding='utf-8') as f:
         f.write("<html><head><meta charset='utf-8'><title>股票報告</title></head><body>")

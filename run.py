@@ -336,6 +336,10 @@ def newup():
 def moni():
     return render_template('file_list_moni.html')
 
+@app.route("/goods")
+def goods():
+    return render_template('file_list_goods.html')
+
 @app.route("/refer/report_new")
 def serve_static(filename):
     # 提供 refer 資料夾下的檔案
